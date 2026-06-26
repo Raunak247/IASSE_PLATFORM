@@ -1,0 +1,330 @@
+{
+  "name": "W6-A — RIPCE Health Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## W6-A: Workflow Health Monitor\n\nRuns every hour. Fetches all recent executions from the n8n API, computes a Health Score (0-100), saves to the iaasse_health_log Data Table, and fires an alert webhook if score drops below 80.\n\n**Setup:** Create an n8n API credential called \"n8n API Key\" with your instance API token.",
+        "height": 200,
+        "width": 300,
+        "color": 3
+      },
+      "id": "bbd9b210-b9e5-41e8-9ad2-30fa1135d533",
+      "name": "Sticky Note 36125b39",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "id": "73d6fabd-76ac-49a5-be76-9e27b39e2d08",
+      "name": "Hourly Health Check",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://raunak420.app.n8n.cloud",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "limit",
+              "value": "100"
+            },
+            {
+              "name": "includeData",
+              "value": "false"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "18c26dbe-1f8e-4db6-b980-0c53036c20ba",
+      "name": "Fetch Recent Executions",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        224,
+        96
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "tCXHu9HpcWrUk0ug",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "language": "pythonNative",
+        "pythonCode": "# Loop over input items and add a new field called 'my_new_field' to the JSON of each one\nfor item in _items:\n  item[\"json\"][\"my_new_field\"] = 1\nreturn _items"
+      },
+      "id": "f94cb1e8-9486-49da-9b03-eb8e1626a505",
+      "name": "Compute Health Score",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "sEwSYKbwx5P2hKJK"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "checked_at": "={{ $json.checkedAt }}",
+            "failed_count": "={{ $json.failedCount }}",
+            "health_score": "={{ $json.healthScore }}",
+            "status": "={{ $json.status }}",
+            "success_rate": "={{ $json.successRate }}",
+            "total_executions": "={{ $json.totalExecutions }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "c99bea38-efb6-4856-9076-cd55e0e9e447",
+      "name": "Save Health Log",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.healthScore }}",
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              },
+              "rightValue": 80
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "66b88fc5-c360-4a66-8120-8490959fc90f",
+      "name": "Health Below Threshold?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "alert_title",
+              "value": "={{ \"RIPCE Health Alert — Score: \" + $json.healthScore + \"/100\" }}",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "alert_body",
+              "value": "={{ \"Status: \" + $json.status + \" | Success Rate: \" + $json.successRate + \"% | Failed: \" + $json.failedCount + \" | Checked: \" + $json.checkedAt }}",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "health_score",
+              "value": "={{ $json.healthScore }}",
+              "type": "number"
+            },
+            {
+              "id": "a4",
+              "name": "status",
+              "value": "={{ $json.status }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6dce4604-882e-45d0-b708-e39b06d141a2",
+      "name": "Build Alert Payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1120,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://raunak420.app.n8n.cloud/webhook/iaasse-alert",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"title\": $json.alert_title, \"body\": $json.alert_body, \"score\": $json.health_score, \"status\": $json.status, \"timestamp\": $now.toISO() } }}",
+        "options": {}
+      },
+      "id": "252e03de-8042-4331-8964-ad16619a23d9",
+      "name": "Send Alert Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1344,
+        0
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ok1",
+              "name": "result",
+              "value": "System healthy — no alert needed",
+              "type": "string"
+            },
+            {
+              "id": "ok2",
+              "name": "health_score",
+              "value": "={{ $json.healthScore }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f6a22560-f9fa-448f-8801-6b99221279a9",
+      "name": "Log Healthy Status",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1120,
+        192
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Hourly Health Check": {
+      "main": [
+        [
+          {
+            "node": "Fetch Recent Executions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Recent Executions": {
+      "main": [
+        [
+          {
+            "node": "Compute Health Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Health Score": {
+      "main": [
+        [
+          {
+            "node": "Save Health Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Health Log": {
+      "main": [
+        [
+          {
+            "node": "Health Below Threshold?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Health Below Threshold?": {
+      "main": [
+        [
+          {
+            "node": "Build Alert Payload",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Healthy Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Alert Payload": {
+      "main": [
+        [
+          {
+            "node": "Send Alert Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "b553dd63-83ba-41b8-9f5d-0346eb62ea76",
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "instanceId": "ce65a335bd8859cda6a7d12f6c83efa81348cabcee78edbf772773d50c588ea9"
+  },
+  "nodeGroups": [],
+  "id": "uC0TZqQoFHKKpZHz",
+  "tags": []
+}

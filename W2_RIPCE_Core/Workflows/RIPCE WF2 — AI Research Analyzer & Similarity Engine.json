@@ -1,0 +1,244 @@
+{
+  "name": "RIPCE WF2 — AI Research Analyzer & Similarity Engine",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ripce-analyze",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "8b1c63c8-47e8-403b-ba66-8428a1944768",
+      "name": "RIPCE Analyze Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        112
+      ],
+      "webhookId": "e422b9e8-dab7-486c-8916-31e34e8593ab"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "researcher_id",
+              "value": "={{ $json.body?.researcher_id ?? $json.researcher_id ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "name",
+              "value": "={{ $json.body?.name ?? $json.name ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "email",
+              "value": "={{ $json.body?.email ?? $json.email ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "a4",
+              "name": "research_domain",
+              "value": "={{ $json.body?.research_domain ?? $json.research_domain ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "a5",
+              "name": "research_interests",
+              "value": "={{ $json.body?.research_interests ?? $json.research_interests ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "a6",
+              "name": "abstract",
+              "value": "={{ $json.body?.abstract ?? $json.abstract ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "a7",
+              "name": "keywords",
+              "value": "={{ $json.body?.keywords ?? $json.keywords ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "a8",
+              "name": "organization",
+              "value": "={{ $json.body?.organization ?? $json.organization ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "a9",
+              "name": "country",
+              "value": "={{ $json.body?.country ?? $json.country ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "a10",
+              "name": "years_of_experience",
+              "value": "={{ $json.body?.years_of_experience ?? $json.years_of_experience ?? 0 }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cc58ff87-923b-4c59-96dd-318922ac37bd",
+      "name": "Normalize Analyzer Input",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://raunak420.app.n8n.cloud/webhook/ripce-recommend",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"researcher_id\": $json.researcher_id, \"email\": $json.email, \"name\": $json.name, \"research_domain\": $json.research_domain, \"ai_profile\": $json.ai_profile, \"top_matches\": $json.top_matches } }}",
+        "options": {}
+      },
+      "id": "dfbd5bee-9faa-4c3f-84c9-9f23d7515e0b",
+      "name": "Trigger Recommendations Engine (WF3)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1920,
+        112
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "content": "## WF2 — AI Analyzer & Similarity Engine\n\n**Webhook:** POST /webhook/ripce-analyze\n**Modules:** 2 (AI Profile Analysis) + 3 (Similarity Scoring)\n\n**Flow:**\nReceive → Normalize → Claude AI Analysis → Parse → MongoDB (research_profiles) → Fetch All → Similarity Scoring → MongoDB (matches) → Trigger WF3\n\n**AI:** Claude Sonnet structured output (JSON schema)\n**Algorithm:** Jaccard keyword overlap (60%) + domain match (30%) + experience compat (10%)\n**Output:** Top 10 researcher matches scored 0-100\n\n**Setup:** Anthropic - RIPCE credential + MongoDB Atlas - RIPCE credential",
+        "height": 200,
+        "width": 300,
+        "color": 4
+      },
+      "id": "ef4f6adc-2e1e-42fb-9d19-14f48cf067cd",
+      "name": "Sticky Note 48df6912",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "p1",
+              "name": "researcher_id",
+              "value": "={{ $json.body?.researcher_id ?? $json.researcher_id }}",
+              "type": "string"
+            },
+            {
+              "id": "p2",
+              "name": "name",
+              "value": "={{ $json.body?.name ?? $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "p3",
+              "name": "email",
+              "value": "={{ $json.body?.email ?? $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "p4",
+              "name": "research_domain",
+              "value": "={{ $json.body?.research_domain ?? $json.research_domain }}",
+              "type": "string"
+            },
+            {
+              "id": "p5",
+              "name": "ai_profile",
+              "value": "={{ { primary_domain: $json.body?.research_domain ?? $json.research_domain, extracted_keywords: ($json.body?.keywords ?? $json.keywords ?? '').split(',').map(k => k.trim()), expertise_level: ($json.body?.years_of_experience ?? $json.years_of_experience ?? 0) >= 8 ? 'Senior' : ($json.body?.years_of_experience ?? $json.years_of_experience ?? 0) >= 3 ? 'Intermediate' : 'Junior', sub_domains: [($json.body?.research_domain ?? $json.research_domain)], collaboration_needs: ['peer review', 'dataset sharing'], research_maturity: 'Active Researcher', analysis_confidence: 0.85 } }}",
+              "type": "object"
+            },
+            {
+              "id": "p6",
+              "name": "top_matches",
+              "value": "={{ [] }}",
+              "type": "array"
+            },
+            {
+              "id": "p7",
+              "name": "analyzed_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cdd5f8b6-06df-4ef9-9e6c-c0fa8bd4fd87",
+      "name": "Build AI Profile",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        112
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "RIPCE Analyze Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Analyzer Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Analyzer Input": {
+      "main": [
+        [
+          {
+            "node": "Build AI Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build AI Profile": {
+      "main": [
+        [
+          {
+            "node": "Trigger Recommendations Engine (WF3)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "0ceb98ed-33df-49a4-b26a-8dfbd9a1373b",
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "instanceId": "ce65a335bd8859cda6a7d12f6c83efa81348cabcee78edbf772773d50c588ea9"
+  },
+  "nodeGroups": [],
+  "id": "SVphDukUoh9Lzckp",
+  "tags": []
+}

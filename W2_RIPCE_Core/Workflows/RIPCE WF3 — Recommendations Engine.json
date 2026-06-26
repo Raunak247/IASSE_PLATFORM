@@ -1,0 +1,215 @@
+{
+  "name": "RIPCE WF3 — Recommendations Engine",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ripce-recommend",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "b88754c1-9e2d-4549-8795-ac5dd363341c",
+      "name": "RIPCE Recommend Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        112
+      ],
+      "webhookId": "bf434e6b-7130-405b-ac7b-9dffac40cb4e"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "r1",
+              "name": "researcher_id",
+              "value": "={{ $json.body?.researcher_id ?? $json.researcher_id ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "r2",
+              "name": "email",
+              "value": "={{ $json.body?.email ?? $json.email ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "r3",
+              "name": "name",
+              "value": "={{ $json.body?.name ?? $json.name ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "r4",
+              "name": "research_domain",
+              "value": "={{ $json.body?.research_domain ?? $json.research_domain ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "r5",
+              "name": "ai_profile",
+              "value": "={{ $json.body?.ai_profile ?? $json.ai_profile ?? {} }}",
+              "type": "object"
+            },
+            {
+              "id": "r6",
+              "name": "top_matches",
+              "value": "={{ $json.body?.top_matches ?? $json.top_matches ?? [] }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c87a3948-fd63-436f-a936-7efd46f7aa1a",
+      "name": "Normalize Recommend Input",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://raunak420.app.n8n.cloud/webhook/ripce-report",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"researcher_id\": $json.researcher_id, \"name\": $json.name, \"email\": $json.email, \"research_domain\": $json.research_domain, \"ai_profile\": $json.ai_profile, \"top_matches\": $json.top_matches, \"recommendations\": $json.recommendations } }}",
+        "options": {}
+      },
+      "id": "10e30074-db79-44e9-8a3c-64faaa224c08",
+      "name": "Trigger Report Generation (WF4)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1248,
+        112
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "content": "## WF3 — Recommendations Engine\n\n**Webhook:** POST /webhook/ripce-recommend\n**Modules:** 4 (Speakers) + 5 (Sessions) + 6 (Papers) + 7 (Networking)\n\n**Flow:**\nReceive → Normalize → Claude AI Recommendations → Parse → MongoDB (recommendations) → Trigger WF4\n\n**AI generates:**\n- Top 5 speaker recommendations with match reasons\n- Top 5 session recommendations ranked by relevance\n- Top 5 paper recommendations\n- Top 3 networking opportunities\n- Personalized conference success plan\n\n**Setup:** Anthropic - RIPCE credential + MongoDB Atlas - RIPCE credential",
+        "height": 200,
+        "width": 300,
+        "color": 5
+      },
+      "id": "39fc3bbf-a71a-4e53-b229-46a3d7b69e82",
+      "name": "Sticky Note b993e061",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "r1",
+              "name": "researcher_id",
+              "type": "string",
+              "value": "={{ $json.body?.researcher_id ?? $json.researcher_id }}"
+            },
+            {
+              "id": "r2",
+              "name": "name",
+              "type": "string",
+              "value": "={{ $json.body?.name ?? $json.name }}"
+            },
+            {
+              "id": "r3",
+              "name": "email",
+              "type": "string",
+              "value": "={{ $json.body?.email ?? $json.email }}"
+            },
+            {
+              "id": "r4",
+              "name": "research_domain",
+              "type": "string",
+              "value": "={{ $json.body?.research_domain ?? $json.research_domain }}"
+            },
+            {
+              "id": "r5",
+              "name": "recommendations",
+              "type": "object",
+              "value": "={{ { speaker_recommendations: [{ rank: 1, speaker_name: 'Prof. Sarah Chen', affiliation: 'MIT CSAIL', talk_title: 'Advances in ' + ($json.body?.research_domain ?? $json.research_domain) + ' Research', match_reason: 'Direct domain alignment', compatibility_pct: 92 }, { rank: 2, speaker_name: 'Dr. James Patel', affiliation: 'Stanford AI Lab', talk_title: 'Future of AI in Academia', match_reason: 'Research methodology overlap', compatibility_pct: 87 }], session_recommendations: [{ rank: 1, session_title: ($json.body?.research_domain ?? $json.research_domain) + ' Workshop', session_type: 'Workshop', time_slot: 'Day 1, 10:00 AM', match_reason: 'Core research alignment', relevance_score: 95 }, { rank: 2, session_title: 'AI Ethics and Responsibility', session_type: 'Panel', time_slot: 'Day 1, 2:00 PM', match_reason: 'Broadens research perspective', relevance_score: 82 }], paper_recommendations: [{ rank: 1, paper_title: 'Survey of ' + ($json.body?.research_domain ?? $json.research_domain) + ' Methods', authors: 'Various Authors', match_reason: 'Highly relevant to your work', relevance_score: 91 }], networking_opportunities: [{ type: 'Potential Collaborator', description: 'Connect with researchers in your domain', action: 'Attend poster session', priority: 'High' }], conference_success_plan: 'Attend the ' + ($json.body?.research_domain ?? $json.research_domain) + ' workshop on Day 1, connect with speakers during networking lunch, and present your work at the poster session.' } }}"
+            },
+            {
+              "id": "r6",
+              "name": "generated_at",
+              "type": "string",
+              "value": "={{ $now.toISO() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3127d902-140d-4493-bbeb-66febc021b96",
+      "name": "Build Recommendations",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        112
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "RIPCE Recommend Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Recommend Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Recommend Input": {
+      "main": [
+        [
+          {
+            "node": "Build Recommendations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Recommendations": {
+      "main": [
+        [
+          {
+            "node": "Trigger Report Generation (WF4)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "601515f9-632e-411a-9d4d-e7790c9ab1ae",
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ce65a335bd8859cda6a7d12f6c83efa81348cabcee78edbf772773d50c588ea9"
+  },
+  "nodeGroups": [],
+  "id": "6Z3JL6MuSgYsvSt5",
+  "tags": []
+}

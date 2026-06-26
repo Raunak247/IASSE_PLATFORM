@@ -1,0 +1,219 @@
+{
+  "name": "W6-C — Living Documentation Engine",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## W6-C: Living Documentation Engine\n\nRuns daily (or click \"Test workflow\" for on-demand). Generates complete RIPCE system documentation using Claude Sonnet.\n\nOutput stored in iaasse_documentation Data Table.\n\n✅ Credential: Anthropic account (assigned)",
+        "height": 200,
+        "width": 300,
+        "color": 5
+      },
+      "id": "d73ed348-f376-43a5-8f55-a0db6089dcaa",
+      "name": "Sticky Note f283cd4f",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        -16
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "cbfe0dcc-d69b-470a-a357-ec06202f7b8b",
+      "name": "Generate Docs Now",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\nreturn [{\n  json: {\n    system: 'RIPCE — Researcher Intelligence & Personalized Conference Experience',\n    instance: 'raunak420.app.n8n.cloud',\n    generatedAt: new Date().toISOString(),\n    workflows: [\n      { id: '2VXCRkebgXcYCcrH', name: 'WF1 — Registration', webhook: '/webhook/ripce-register', fields: ['name','email','research_domain','abstract'], outputs: ['researcher_id','MongoDB researchers','Google Sheets log'], triggers: 'WF2' },\n      { id: 'SVphDukUoh9Lzckp', name: 'WF2 — AI Analyzer', webhook: '/webhook/ripce-analyze', model: 'claude-sonnet-4-5', scoring: 'Jaccard keyword 60% + domain 30% + experience 10%', outputs: ['MongoDB research_profiles','MongoDB matches'], triggers: 'WF3' },\n      { id: '6Z3JL6MuSgYsvSt5', name: 'WF3 — Recommendations', webhook: '/webhook/ripce-recommend', model: 'claude-sonnet-4-5', outputs: ['top-5 speakers/sessions/papers/networking','MongoDB recommendations'], triggers: 'WF4' },\n      { id: 'bplncQpMPU3mKGgq', name: 'WF4 — Report Generation', webhook: '/webhook/ripce-report', model: 'claude-sonnet-4-5', outputs: ['Markdown report','ripce_reports Data Table'], status: 'ACTIVE' },\n      { id: 'uC0TZqQoFHKKpZHz', name: 'W6-A — Health Monitor', schedule: 'Hourly', outputs: ['0-100 health score','iaasse_health_log Data Table','alert if score < 80'], status: 'ACTIVE' },\n      { id: 'KkLcRXLhoZ1Svy28', name: 'W6-B — Knowledge Copilot', type: 'Chat interface', model: 'claude-sonnet-4-5', status: 'ACTIVE' },\n      { id: 'current', name: 'W6-C — Living Documentation', schedule: 'Daily + manual', outputs: ['iaasse_documentation Data Table'], status: 'ACTIVE' },\n      { id: 'W6-D', name: 'W6-D — SOP & Incident', webhook: '/webhook/iaasse-sop', types: ['troubleshoot','sop'], status: 'ACTIVE' }\n    ],\n    credentials: [\n      { name: 'Anthropic account', type: 'anthropicApi', usedBy: ['WF2','WF3','WF4','W6-B','W6-C','W6-D'], status: 'CONFIGURED' },\n      { name: 'MongoDB Atlas - RIPCE', type: 'mongoDb', usedBy: ['WF1','WF2','WF3'], status: 'NEEDS SETUP' },\n      { name: 'Google Sheets - RIPCE', type: 'googleSheetsOAuth2', usedBy: ['WF1'], status: 'NEEDS SETUP' },\n      { name: 'n8n API Key', type: 'httpHeaderAuth', usedBy: ['W6-A','W6-C'], status: 'NEEDS SETUP' }\n    ],\n    mongoCollections: ['researchers','research_profiles','matches','recommendations'],\n    dataTables: ['iaasse_health_log','iaasse_documentation','iaasse_sop_log','ripce_reports'],\n    pipeline: 'POST /webhook/ripce-register → WF1 → WF2 → WF3 → WF4 → report stored'\n  }\n}];\n"
+      },
+      "id": "79bebcf2-f8da-43d8-ad37-71518cd5876b",
+      "name": "Build System Snapshot",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ \"Generate complete RIPCE system documentation based on this snapshot:\\n\\n\" + JSON.stringify($json) + \"\\n\\nInclude these sections:\\n# 1. System Overview\\n# 2. Architecture & Data Flow (WF1→WF2→WF3→WF4)\\n# 3. Workflow Reference (each workflow: purpose, inputs, outputs, nodes)\\n# 4. Credential Setup Guide (step-by-step for each credential)\\n# 5. Daily Operations Checklist\\n# 6. Weekly Monitoring SOP\\n# 7. Troubleshooting Guide (common errors + exact fixes)\\n# 8. Credential Rotation Procedure\\n# 9. Incident Response Playbook\\n# 10. Scalability Notes\\n\\nWrite clearly for non-developer IAASSE administrators.\" }}",
+        "options": {}
+      },
+      "id": "63297dbd-297a-49aa-8e6d-f0706f5078c0",
+      "name": "Generate System Documentation",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        448,
+        112
+      ],
+      "executeOnce": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d1",
+              "name": "status",
+              "value": "Documentation generated successfully",
+              "type": "string"
+            },
+            {
+              "id": "d2",
+              "name": "generated_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f4d7304f-cbaf-4a10-815c-81f63cc22a85",
+      "name": "Done",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        800,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "914c5f14-acf7-48d1-ae50-89495b6a6663",
+      "name": "Daily Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-lite",
+        "options": {}
+      },
+      "id": "ddc7ef5c-7094-4a8e-83e1-40352732bd6d",
+      "name": "Gemini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        528,
+        336
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "BbrTeN4fh7PKJvWM",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "e9293848-964a-4822-bd6e-9f2c9e47a31e",
+      "name": "Handle API Error",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        800,
+        16
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Generate Docs Now": {
+      "main": [
+        [
+          {
+            "node": "Build System Snapshot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build System Snapshot": {
+      "main": [
+        [
+          {
+            "node": "Generate System Documentation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Schedule": {
+      "main": [
+        [
+          {
+            "node": "Build System Snapshot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate System Documentation",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate System Documentation": {
+      "main": [
+        [
+          {
+            "node": "Done",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Handle API Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "971739f5-9e75-4abe-80da-3621401e1661",
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "instanceId": "ce65a335bd8859cda6a7d12f6c83efa81348cabcee78edbf772773d50c588ea9"
+  },
+  "nodeGroups": [],
+  "id": "YlanVS5E6gc6fSMZ",
+  "tags": []
+}

@@ -1,0 +1,367 @@
+{
+  "name": "RIPCE WF1 — Researcher Registration & Validation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ripce-register",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "9a57835a-8a4d-4bae-8078-359b6337e032",
+      "name": "RIPCE Registration Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        96
+      ],
+      "webhookId": "25b222cd-2429-4d93-a12b-7c52edc6c88e"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1",
+              "name": "name",
+              "value": "={{ $json.body?.name ?? $json.name ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "f2",
+              "name": "email",
+              "value": "={{ $json.body?.email ?? $json.email ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "f3",
+              "name": "organization",
+              "value": "={{ $json.body?.organization ?? $json.organization ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "f4",
+              "name": "country",
+              "value": "={{ $json.body?.country ?? $json.country ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "f5",
+              "name": "research_domain",
+              "value": "={{ $json.body?.research_domain ?? $json.research_domain ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "f6",
+              "name": "research_interests",
+              "value": "={{ $json.body?.research_interests ?? $json.research_interests ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "f7",
+              "name": "abstract",
+              "value": "={{ $json.body?.abstract ?? $json.abstract ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "f8",
+              "name": "paper_title",
+              "value": "={{ $json.body?.paper_title ?? $json.paper_title ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "f9",
+              "name": "keywords",
+              "value": "={{ $json.body?.keywords ?? $json.keywords ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "f10",
+              "name": "google_scholar_url",
+              "value": "={{ $json.body?.google_scholar_url ?? $json.google_scholar_url ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "f11",
+              "name": "linkedin_url",
+              "value": "={{ $json.body?.linkedin_url ?? $json.linkedin_url ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "f12",
+              "name": "orcid",
+              "value": "={{ $json.body?.orcid ?? $json.orcid ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "f13",
+              "name": "years_of_experience",
+              "value": "={{ $json.body?.years_of_experience ?? $json.years_of_experience ?? 0 }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "40bf3373-4865-4a78-8d06-eadfebd38da7",
+      "name": "Normalize Payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.name }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              },
+              "rightValue": ""
+            },
+            {
+              "leftValue": "={{ $json.email }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              },
+              "rightValue": ""
+            },
+            {
+              "leftValue": "={{ $json.research_domain }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              },
+              "rightValue": ""
+            },
+            {
+              "leftValue": "={{ $json.abstract }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              },
+              "rightValue": ""
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "132c4b5c-2c84-4763-a053-ed93fbf467fe",
+      "name": "Validate Required Fields",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "rid",
+              "name": "researcher_id",
+              "value": "={{ \"RIPCE-\" + $now.toFormat(\"yyyyMMdd\") + \"-\" + $now.toMillis().toString(36).toUpperCase() }}",
+              "type": "string"
+            },
+            {
+              "id": "ts",
+              "name": "registered_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "st",
+              "name": "status",
+              "value": "pending_analysis",
+              "type": "string"
+            },
+            {
+              "id": "rg",
+              "name": "report_generated",
+              "value": "={{ false }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "4966b1e7-8eb6-47af-abb3-5051c213c52c",
+      "name": "Generate Researcher ID",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://raunak420.app.n8n.cloud/webhook/ripce-analyze",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"researcher_id\": $json.researcher_id, \"name\": $json.name, \"email\": $json.email, \"research_domain\": $json.research_domain, \"research_interests\": $json.research_interests, \"abstract\": $json.abstract, \"keywords\": $json.keywords, \"organization\": $json.organization, \"country\": $json.country, \"years_of_experience\": $json.years_of_experience } }}",
+        "options": {}
+      },
+      "id": "461680c1-7cdd-490b-919e-99a06d245486",
+      "name": "Trigger AI Analysis (WF2)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1344,
+        0
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"researcher_id\": $(\"Generate Researcher ID\").item.json.researcher_id, \"message\": \"Registration successful! Your personalized AI report will be emailed to \" + $(\"Generate Researcher ID\").item.json.email + \" shortly.\" } }}",
+        "options": {
+          "responseCode": 201
+        }
+      },
+      "id": "68d20e41-71f5-4332-a10c-ad983f86ae8b",
+      "name": "Respond 201 Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1568,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": {
+          "success": false,
+          "message": "Missing required fields: name, email, research_domain, abstract."
+        },
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "29f03ac8-9d53-42eb-8111-46c19a84c999",
+      "name": "Reject Invalid Submission",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        672,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## WF1 — Researcher Registration & Validation\n\n**Webhook:** POST /webhook/ripce-register\n\n**Flow:** Receive → Normalize → Validate → Generate ID → MongoDB → Sheets → Trigger WF2 → Respond 201\n\n**Setup Required:**\n1. MongoDB Atlas - RIPCE credential\n2. Google Sheets - RIPCE credential\n3. Set your Google Sheet ID in the Sheets node\n\n**Error path:** Returns 400 if required fields missing",
+        "height": 200,
+        "width": 300,
+        "color": 3
+      },
+      "id": "a5c28200-b93b-44c9-bb58-7164c69206b6",
+      "name": "Sticky Note c5d2a2a9",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        -48
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "RIPCE Registration Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Payload": {
+      "main": [
+        [
+          {
+            "node": "Validate Required Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Required Fields": {
+      "main": [
+        [
+          {
+            "node": "Generate Researcher ID",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reject Invalid Submission",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger AI Analysis (WF2)": {
+      "main": [
+        [
+          {
+            "node": "Respond 201 Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Researcher ID": {
+      "main": [
+        [
+          {
+            "node": "Trigger AI Analysis (WF2)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "f89a1c0f-d304-4378-9999-95f8056ac435",
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "instanceId": "ce65a335bd8859cda6a7d12f6c83efa81348cabcee78edbf772773d50c588ea9"
+  },
+  "nodeGroups": [],
+  "id": "2VXCRkebgXcYCcrH",
+  "tags": []
+}

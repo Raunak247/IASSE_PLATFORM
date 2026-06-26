@@ -1,0 +1,33 @@
+# Environment Variables
+.env
+.env.*
+
+# n8n
+.n8n/
+
+# Node
+node_modules/
+
+# Logs
+*.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Credentials
+credentials/
+*.pem
+*.key
+*.crt
+service-account.json
+secret.json
+
+# IDE
+.vscode/
+.idea/
+
+# OS Files
+.DS_Store
+Thumbs.db

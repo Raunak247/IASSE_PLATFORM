@@ -1,0 +1,1313 @@
+{
+  "name": "IAASSE W4 — AI Persona Stress Test",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "b0ded33e-97c4-4fb4-937c-e482f34fb32f",
+      "name": "Start Test Run",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const profiles = [\n  // ---- Undergraduate Students ----\n  { full_name: \"Aisha Bello\", country: \"Nigeria\", academic_level: \"Undergraduate Student\", research_area: \"Computer Vision\", biography: \"Final-year CS student passionate about applying vision models to agriculture.\", career_goals: \"Pursue a Master's in AI and work on crop-monitoring systems.\", reason_for_joining: \"Wants mentorship from researchers in applied ML.\", edge_case_flags: [] },\n  { full_name: \"Liam O'Connor\", country: \"Ireland\", academic_level: \"Undergraduate Student\", research_area: \"Robotics\", biography: \"Likes robots.\", career_goals: \"Not sure yet.\", reason_for_joining: \"\", edge_case_flags: [\"empty_interests\", \"extremely_short_biography\"] },\n  { full_name: \"Sara Kim\", country: \"South Korea\", academic_level: \"Undergraduate Student\", research_area: \"NLP\", biography: \"i study language and AI is very intresting for me i want to do good work and help peoples comunication beetween countrys\", career_goals: \"to become good researcher and help world\", reason_for_joining: \"i like comunity and learn more thing\", edge_case_flags: [\"poor_grammar\"] },\n  { full_name: \"Marco Rossi\", country: \"Italy\", academic_level: \"Undergraduate Student\", research_area: \"Bioinformatics\", biography: \"\", career_goals: \"Graduate school in computational biology.\", reason_for_joining: \"Recommended by a professor.\", edge_case_flags: [\"missing_biography\"] },\n\n  // ---- Master's Students ----\n  { full_name: \"Fatima Al-Sayed\", country: \"Egypt\", academic_level: \"Master's Student\", research_area: \"Cybersecurity\", biography: \"Researching adversarial robustness of intrusion detection systems.\", career_goals: \"PhD in security, then a research lab role.\", reason_for_joining: \"Wants access to IAASSE's security working group.\", edge_case_flags: [] },\n  { full_name: \"Wei Zhang\", country: \"China\", academic_level: \"Master's Student\", research_area: \"Reinforcement Learning\", biography: \"Interested in multi-agent RL, generative models, robotics, climate modeling, educational technology, and quantum computing applications.\", career_goals: \"Explore interdisciplinary research before committing to a PhD focus.\", reason_for_joining: \"Wants to meet people across many subfields.\", edge_case_flags: [\"multiple_interests\"] },\n  { full_name: \"Carla Mendes\", country: \"Brazil\", academic_level: \"Master's Student\", research_area: \"Computational Linguistics\", biography: \"Carla is a master's student studying computational linguistics. Carla is a master's student studying computational linguistics and is very dedicated to her field of computational linguistics.\", career_goals: \"Publish in a top NLP venue. Publish in a top NLP venue.\", reason_for_joining: \"To network with linguistics researchers and to network with researchers.\", edge_case_flags: [\"duplicate_information\"] },\n  { full_name: \"Noah Williams\", country: \"United States\", academic_level: \"Master's Student\", research_area: \"Human-Computer Interaction\", biography: \"Designs accessible interfaces for assistive technology users.\", career_goals: \"Join a UX research team at a health-tech company.\", reason_for_joining: \"Looking for HCI mentors and conference leads.\", edge_case_flags: [] },\n\n  // ---- PhD Researchers ----\n  { full_name: \"Priya Nair\", country: \"India\", academic_level: \"PhD Researcher\", research_area: \"Quantum Machine Learning\", biography: \"Priya is a third-year PhD researcher whose work sits at the intersection of quantum computing and machine learning. Her dissertation explores variational quantum circuits as feature extractors for high-dimensional classification tasks, with a particular focus on noise resilience in near-term quantum hardware. Before starting her PhD, she completed a Master's in theoretical physics and spent a year as a research assistant building simulation pipelines for superconducting qubit systems. She has presented preliminary results at two regional physics symposiums and is currently preparing her first first-author submission to a quantum computing workshop. Outside of her core research, Priya mentors undergraduate students in a campus quantum-computing club and has a long-standing interest in science communication, having written several explainer articles translating dense quantum concepts for general audiences.\", career_goals: \"Complete her PhD and move into an industry quantum-AI research role.\", reason_for_joining: \"Wants to connect with other PhD researchers working across quantum and ML.\", edge_case_flags: [\"extremely_long_biography\"] },\n  { full_name: \"Tomasz Nowak\", country: \"Poland\", academic_level: \"PhD Researcher\", research_area: \"Distributed Systems\", biography: \"Studies consensus protocols for large-scale distributed databases.\", career_goals: \"Figure things out, maybe academia, maybe industry, open to options.\", reason_for_joining: \"Generally interested in being part of something useful.\", edge_case_flags: [\"ambiguous_goals\"] },\n  { full_name: \"Yuki Tanaka\", country: \"Japan\", academic_level: \"PhD Researcher\", research_area: \"Materials Science AI\", biography: \"Uses ML surrogate models to accelerate materials discovery simulations.\", career_goals: \"Lead a research group bridging AI and materials engineering.\", reason_for_joining: \"Seeks collaboration with computational chemists in IAASSE.\", edge_case_flags: [] },\n  { full_name: \"Elena Petrova\", country: \"Russia\", academic_level: \"PhD Researcher\", research_area: \"Causal Inference\", biography: \"Develops causal discovery methods for observational healthcare data.\", career_goals: \"Postdoc at a biostatistics-focused lab.\", reason_for_joining: \"Wants feedback on a working paper before submission.\", edge_case_flags: [] },\n\n  // ---- Professors ----\n  { full_name: \"Dr. James Okafor\", country: \"Nigeria\", academic_level: \"Professor\", research_area: \"Renewable Energy Systems\", biography: \"Associate professor researching smart-grid optimization and energy storage.\", career_goals: \"Expand international collaborations on grid resilience.\", reason_for_joining: \"Interested in co-authoring a cross-border research proposal.\", edge_case_flags: [] },\n  { full_name: \"Dr. Helena Schmidt\", country: \"Germany\", academic_level: \"Professor\", research_area: \"Computational Neuroscience\", biography: \"Runs a lab modeling cortical circuits using spiking neural networks.\", career_goals: \"Recruit PhD students through IAASSE's network.\", reason_for_joining: \"Wants to advertise open positions in her lab.\", edge_case_flags: [] },\n  { full_name: \"Dr. Robert Chen\", country: \"Singapore\", academic_level: \"Professor\", research_area: \"Maritime Logistics Optimization\", biography: \"Works on port-scheduling algorithms with industry partners.\", career_goals: \"Bridge academic optimization research with logistics companies.\", reason_for_joining: \"Looking for industry-facing conference tracks.\", edge_case_flags: [] },\n  { full_name: \"Dr. Amara Diallo\", country: \"Senegal\", academic_level: \"Professor\", research_area: \"Public Health Informatics\", biography: \"Studies digital epidemiology and outbreak-prediction systems.\", career_goals: \"Build a regional public-health data consortium.\", reason_for_joining: \"Wants to recruit collaborators for a multi-country study.\", edge_case_flags: [] },\n\n  // ---- Industry Professionals ----\n  { full_name: \"Jonathan Park\", country: \"United States\", academic_level: \"Industry Professional\", research_area: \"MLOps\", biography: \"Staff engineer building model-deployment infrastructure at a fintech company.\", career_goals: \"Move into a research-adjacent platform leadership role.\", reason_for_joining: \"Wants to stay current with academic ML research.\", edge_case_flags: [] },\n  { full_name: \"Maria Garcia\", country: \"Spain\", academic_level: \"Industry Professional\", research_area: \"Applied NLP\", biography: \"Leads a conversational-AI team at a customer-service software company.\", career_goals: \"Publish applied research bridging industry and academia.\", reason_for_joining: \"Looking for co-authorship opportunities.\", edge_case_flags: [] },\n  { full_name: \"Ahmed Hassan\", country: \"United Arab Emirates\", academic_level: \"Industry Professional\", research_area: \"Smart City Infrastructure\", biography: \"Product manager for IoT sensor networks in urban planning.\", career_goals: \"Inform city-scale pilots with academic research findings.\", reason_for_joining: \"Wants access to IAASSE's urban-tech working group.\", edge_case_flags: [] },\n  { full_name: \"Lucia Ferreira\", country: \"Portugal\", academic_level: \"Industry Professional\", research_area: \"Climate Risk Modeling\", biography: \"Data scientist building climate-risk models for an insurance firm.\", career_goals: \"Transition into a hybrid academic-industry research role.\", reason_for_joining: \"Seeking academic collaborators for a joint publication.\", edge_case_flags: [] }\n];\n\nreturn profiles.map((p, i) => ({\n  json: {\n    member_id: 'M' + String(i + 1).padStart(3, '0'),\n    full_name: p.full_name,\n    country: p.country,\n    academic_level: p.academic_level,\n    research_area: p.research_area,\n    biography: p.biography,\n    career_goals: p.career_goals,\n    reason_for_joining: p.reason_for_joining,\n    edge_case_flags: p.edge_case_flags.join(', ')\n  }\n}));"
+      },
+      "id": "e3ec713a-914b-4b35-94c5-31835f14268c",
+      "name": "Generate 20 Mock Signups",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1TDJeo4FOZWhrYInMQF4EumNIv8YZ8nMZ7jn5AP6mUNc"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Mock_Signups"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "1ed31cbf-a839-4221-b19b-f0902a4e39ac",
+      "name": "Log Mock Signups",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        448,
+        176
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ZQlhbYe34nfNjWmQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1TDJeo4FOZWhrYInMQF4EumNIv8YZ8nMZ7jn5AP6mUNc"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Generated_Outreach"
+        },
+        "options": {}
+      },
+      "id": "99924df4-5b36-4694-95c2-bc5e99b0546a",
+      "name": "Read All Generated Outreach",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        960,
+        112
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ZQlhbYe34nfNjWmQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function tokenize(text) {\n  return new Set((String(text || '')).toLowerCase().match(/[a-z0-9']+/g) || []);\n}\nfunction jaccard(a, b) {\n  if (a.size === 0 && b.size === 0) return 0;\n  let intersection = 0;\n  for (const tok of a) if (b.has(tok)) intersection++;\n  const union = a.size + b.size - intersection;\n  return union === 0 ? 0 : intersection / union;\n}\n\nconst rows = items.map(i => i.json);\nconst tokenSets = rows.map(r => tokenize(r.email_body));\n\nconst results = rows.map((row, idx) => {\n  let maxSim = 0;\n  let mostSimilarTo = null;\n  for (let j = 0; j < rows.length; j++) {\n    if (j === idx) continue;\n    const sim = jaccard(tokenSets[idx], tokenSets[j]);\n    if (sim > maxSim) { maxSim = sim; mostSimilarTo = rows[j].member_id; }\n  }\n  const similarityPercent = Math.round(maxSim * 1000) / 10;\n  return {\n    member_id: row.member_id,\n    full_name: row.full_name,\n    max_similarity_percent: similarityPercent,\n    most_similar_to_member_id: mostSimilarTo,\n    flagged_duplicate: similarityPercent > 30\n  };\n});\n\nconst flaggedCount = results.filter(r => r.flagged_duplicate).length;\nconst uniquenessScore = rows.length > 0 ? Math.round((1 - flaggedCount / rows.length) * 1000) / 10 : 100;\nconst avgSimilarity = results.length > 0 ? Math.round((results.reduce((s, r) => s + r.max_similarity_percent, 0) / results.length) * 10) / 10 : 0;\nconst variationScore = Math.round((100 - avgSimilarity) * 10) / 10;\nconst recommendation = flaggedCount > 0\n  ? (flaggedCount + ' email(s) exceeded the 30% similarity threshold. Review the prompt for over-templated phrasing and add more profile-specific detail.')\n  : 'No emails exceeded the 30% similarity threshold. Personalization variation looks healthy.';\n\nreturn results.map(r => ({\n  json: Object.assign({}, r, {\n    run_uniqueness_score: uniquenessScore,\n    run_variation_score: variationScore,\n    run_recommendation: recommendation\n  })\n}));"
+      },
+      "id": "d915f8b7-d017-4491-99f3-49b9b3e6ebf8",
+      "name": "Detect Duplicates",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1TDJeo4FOZWhrYInMQF4EumNIv8YZ8nMZ7jn5AP6mUNc"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Duplicate_Analysis"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "2015679d-14ca-4eb0-9c64-8cde46c0f767",
+      "name": "Log Duplicate Analysis",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1472,
+        112
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ZQlhbYe34nfNjWmQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const outreach = $('Read All Generated Outreach').all().map(i => i.json);\nconst dupes = $('Detect Duplicates').all().map(i => i.json);\n\nfunction avg(nums) { return nums.length ? Math.round((nums.reduce((a, b) => a + b, 0) / nums.length) * 10) / 10 : 0; }\nfunction countBy(arr, key) {\n  const out = {};\n  for (const item of arr) {\n    const k = item[key] || 'Unknown';\n    out[k] = (out[k] || 0) + 1;\n  }\n  return out;\n}\n\nconst engagementScores = outreach.map(r => Number(r.engagement_score) || 0);\nconst avgEngagement = avg(engagementScores);\n\nconst categoryDistribution = countBy(outreach, 'classification');\nconst openDistribution = countBy(outreach, 'open_likelihood');\nconst academicLevelDistribution = countBy(outreach, 'academic_level');\n\nconst flaggedCount = dupes.filter(d => d.flagged_duplicate).length;\nconst duplicatePercent = dupes.length ? Math.round((flaggedCount / dupes.length) * 1000) / 10 : 0;\n\nconst totalRows = outreach.length;\nconst successRate = totalRows ? 100 : 0;\n\nconst edgeCaseRows = outreach.filter(r => r.edge_case_flags && String(r.edge_case_flags).trim() !== '');\nconst edgeCasePassRate = edgeCaseRows.length ? Math.round((edgeCaseRows.filter(r => r.subject && r.email_body).length / edgeCaseRows.length) * 1000) / 10 : 100;\n\nconst runId = 'RUN-' + new Date().toISOString();\n\nconst reportText = [\n  'IAASSE W4 AI Persona Stress Test — Run ' + runId,\n  '----------------------------------------------------',\n  'Members processed: ' + totalRows + ' / 20',\n  'Workflow success rate: ' + successRate + '%',\n  'Average engagement score: ' + avgEngagement + ' / 100',\n  'Category distribution: ' + JSON.stringify(categoryDistribution),\n  'Open-likelihood distribution: ' + JSON.stringify(openDistribution),\n  'Academic level distribution: ' + JSON.stringify(academicLevelDistribution),\n  'Duplicate-flagged emails (>30% similarity): ' + flaggedCount + ' (' + duplicatePercent + '%)',\n  'Uniqueness score: ' + (dupes[0] ? dupes[0].run_uniqueness_score : 'n/a'),\n  'Variation score: ' + (dupes[0] ? dupes[0].run_variation_score : 'n/a'),\n  'Edge case rows tested: ' + edgeCaseRows.length + ', pass rate: ' + edgeCasePassRate + '%',\n  'Recommendation: ' + (dupes[0] ? dupes[0].run_recommendation : 'n/a')\n].join('\\n');\n\nreturn [{\n  json: {\n    run_id: runId,\n    timestamp: new Date().toISOString(),\n    members_processed: totalRows,\n    workflow_success_rate: successRate,\n    avg_engagement_score: avgEngagement,\n    category_distribution: JSON.stringify(categoryDistribution),\n    open_likelihood_distribution: JSON.stringify(openDistribution),\n    academic_level_distribution: JSON.stringify(academicLevelDistribution),\n    duplicate_flagged_count: flaggedCount,\n    duplicate_percent: duplicatePercent,\n    edge_case_rows_tested: edgeCaseRows.length,\n    edge_case_pass_rate: edgeCasePassRate,\n    report_text: reportText\n  }\n}];"
+      },
+      "id": "7f1acf81-7ec7-4ab0-8044-3317c28d905b",
+      "name": "Build Analytics & Final Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1TDJeo4FOZWhrYInMQF4EumNIv8YZ8nMZ7jn5AP6mUNc"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Analytics_Dashboard"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "baae0c39-2866-41ab-a1bf-eed818a0976e",
+      "name": "Log Analytics Dashboard",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2048,
+        112
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ZQlhbYe34nfNjWmQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "models/gemini-3-flash-preview",
+          "cachedResultName": "models/gemini-3-flash-preview"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Write personalized IAASSE outreach for this applicant. If a field is missing, very short, very long, or has grammar issues, handle it gracefully and still produce a professional, genuinely personalized message that references something specific from their profile. Respond with ONLY valid JSON, no markdown fences, no commentary, matching exactly this shape: {\"subject\": string, \"email_body\": string, \"cta\": string, \"closing\": string}. email_body must stay under 180 words.\n\nName: {{ $json.full_name }}\nCountry: {{ $json.country }}\nAcademic Level: {{ $json.academic_level }}\nResearch Area: {{ $json.research_area }}\nBiography: {{ $json.biography || \"(not provided)\" }}\nCareer Goals: {{ $json.career_goals || \"(not provided)\" }}\nReason for Joining: {{ $json.reason_for_joining || \"(not provided)\" }}"
+            }
+          ]
+        },
+        "simplify": false,
+        "jsonOutput": true,
+        "builtInTools": {},
+        "options": {
+          "systemMessage": "You are an outreach specialist for IAASSE, an academic professional society. You write warm, specific, non-generic personalized outreach emails. You ALWAYS respond with ONLY valid JSON.",
+          "maxOutputTokens": 1024,
+          "temperature": 0.7
+        }
+      },
+      "id": "71abc4bb-b63b-46ef-b21e-dd9207f5c950",
+      "name": "Gemini: Generate Outreach",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        896,
+        -160
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "BbrTeN4fh7PKJvWM",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const signup = $('Loop Over Members').item.json;\nlet raw = '{}';\ntry {\n  if ($json.candidates && $json.candidates[0] && $json.candidates[0].content && $json.candidates[0].content.parts && $json.candidates[0].content.parts[0]) {\n    raw = $json.candidates[0].content.parts[0].text || '{}';\n  } else if ($json.content && $json.content[0] && $json.content[0].text) {\n    raw = $json.content[0].text;\n  } else if (typeof $json.text === 'string') {\n    raw = $json.text;\n  }\n} catch (e) { raw = '{}'; }\n\nlet parsed;\ntry {\n  const cleaned = raw.replace(/```json/g, '').replace(/```/g, '').trim();\n  parsed = JSON.parse(cleaned);\n} catch (e) {\n  parsed = {\n    subject: \"An invitation to connect with IAASSE\",\n    email_body: \"Dear \" + (signup.full_name || \"there\") + \", thank you for your interest in IAASSE.\",\n    cta: \"Reply to this email to schedule a short welcome call.\",\n    closing: \"Warm regards,\\nThe IAASSE Team\"\n  };\n}\n\nreturn {\n  json: {\n    member_id: signup.member_id,\n    full_name: signup.full_name,\n    country: signup.country,\n    academic_level: signup.academic_level,\n    research_area: signup.research_area,\n    biography: signup.biography,\n    career_goals: signup.career_goals,\n    reason_for_joining: signup.reason_for_joining,\n    edge_case_flags: signup.edge_case_flags,\n    subject: parsed.subject || '',\n    email_body: parsed.email_body || '',\n    cta: parsed.cta || '',\n    closing: parsed.closing || ''\n  }\n};"
+      },
+      "id": "1d804fe9-a946-4844-9138-704ef7b67e0e",
+      "name": "Parse Outreach Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "models/gemini-3-flash-preview",
+          "cachedResultName": "models/gemini-3-flash-preview"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Evaluate this applicant and the outreach email already drafted for them. Respond with ONLY valid JSON, no markdown fences, no commentary, matching exactly this shape: {\"engagement_score\": number (0-100), \"engagement_reasoning\": string, \"classification\": one of [\"Research Enthusiast\",\"Publication Focused\",\"Conference Seeker\",\"Networking Focused\",\"Passive Member\"], \"classification_confidence\": number (0-1), \"open_likelihood\": one of [\"High\",\"Medium\",\"Low\"], \"open_reasoning\": string, \"recommended_opportunity\": one of [\"Conference Participation\",\"Research Collaboration\",\"Journal Publication\",\"Volunteer Program\",\"Industry Networking\",\"Student Development Program\"], \"recommendation_reasoning\": string}.\\n\\nApplicant:\\nName: {{ $json.full_name }}\\nAcademic Level: {{ $json.academic_level }}\\nResearch Area: {{ $json.research_area }}\\nBiography: {{ $json.biography || \"(not provided)\" }}\\nCareer Goals: {{ $json.career_goals || \"(not provided)\" }}\\nReason for Joining: {{ $json.reason_for_joining || \"(not provided)\" }}\\n\\nDrafted email subject: {{ $json.subject }}\\nDrafted email body: {{ $json.email_body }}"
+            }
+          ]
+        },
+        "simplify": false,
+        "jsonOutput": true,
+        "builtInTools": {},
+        "options": {
+          "systemMessage": "You are a membership-engagement analyst for IAASSE. You ALWAYS respond with ONLY valid JSON.",
+          "maxOutputTokens": 600,
+          "temperature": 0.4
+        }
+      },
+      "id": "3d1bd4ab-3764-42c7-a4ee-4e29d7f0a9ea",
+      "name": "Gemini: Score & Classify",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        1696,
+        -160
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "BbrTeN4fh7PKJvWM",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const prior = $('Parse Outreach Response').item.json;\nlet raw = '{}';\ntry {\n  if ($json.candidates && $json.candidates[0] && $json.candidates[0].content && $json.candidates[0].content.parts && $json.candidates[0].content.parts[0]) {\n    raw = $json.candidates[0].content.parts[0].text || '{}';\n  } else if ($json.content && $json.content[0] && $json.content[0].text) {\n    raw = $json.content[0].text;\n  } else if (typeof $json.text === 'string') {\n    raw = $json.text;\n  }\n} catch (e) { raw = '{}'; }\n\nlet parsed;\ntry {\n  const cleaned = raw.replace(/```json/g, '').replace(/```/g, '').trim();\n  parsed = JSON.parse(cleaned);\n} catch (e) {\n  parsed = {\n    engagement_score: 50,\n    engagement_reasoning: \"Default score applied due to a parsing error; manual review recommended.\",\n    classification: \"Passive Member\",\n    classification_confidence: 0,\n    open_likelihood: \"Medium\",\n    open_reasoning: \"Default value applied due to a parsing error.\",\n    recommended_opportunity: \"Student Development Program\",\n    recommendation_reasoning: \"Default recommendation applied due to a parsing error; manual review recommended.\"\n  };\n}\n\nreturn {\n  json: Object.assign({}, prior, {\n    engagement_score: parsed.engagement_score,\n    engagement_reasoning: parsed.engagement_reasoning,\n    classification: parsed.classification,\n    classification_confidence: parsed.classification_confidence,\n    open_likelihood: parsed.open_likelihood,\n    open_reasoning: parsed.open_reasoning,\n    recommended_opportunity: parsed.recommended_opportunity,\n    recommendation_reasoning: parsed.recommendation_reasoning\n  })\n};"
+      },
+      "id": "99f15f1d-fca1-47ad-8ccb-72fd6a2327b5",
+      "name": "Parse Scoring Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2272,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "models/gemini-3-flash-preview",
+          "cachedResultName": "models/gemini-3-flash-preview"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Grade this outreach email written for an IAASSE applicant. Respond with ONLY valid JSON, no markdown fences, no commentary, matching exactly this shape: {\"personalization_score\": number (1-5), \"professionalism_score\": number (1-5), \"relevance_score\": number (1-5), \"clarity_score\": number (1-5), \"actionability_score\": number (1-5), \"justification\": string}. The justification must briefly justify each of the five scores.\\n\\nApplicant context: {{ $json.academic_level }}, research area {{ $json.research_area }}, biography: {{ $json.biography || \"(not provided)\" }}\\n\\nSubject: {{ $json.subject }}\\nEmail body: {{ $json.email_body }}\\nCTA: {{ $json.cta }}\\nClosing: {{ $json.closing }}"
+            }
+          ]
+        },
+        "simplify": false,
+        "jsonOutput": true,
+        "builtInTools": {},
+        "options": {
+          "systemMessage": "You are a strict QA reviewer grading outreach emails for IAASSE. You ALWAYS respond with ONLY valid JSON.",
+          "maxOutputTokens": 500,
+          "temperature": 0.2
+        }
+      },
+      "id": "79101c78-874e-4253-8f6c-07d462432357",
+      "name": "Gemini: QA Evaluate",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        2496,
+        -160
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "BbrTeN4fh7PKJvWM",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const prior = $('Parse Scoring Response').item.json;\nlet raw = '{}';\ntry {\n  if ($json.candidates && $json.candidates[0] && $json.candidates[0].content && $json.candidates[0].content.parts && $json.candidates[0].content.parts[0]) {\n    raw = $json.candidates[0].content.parts[0].text || '{}';\n  } else if ($json.content && $json.content[0] && $json.content[0].text) {\n    raw = $json.content[0].text;\n  } else if (typeof $json.text === 'string') {\n    raw = $json.text;\n  }\n} catch (e) { raw = '{}'; }\n\nlet parsed;\ntry {\n  const cleaned = raw.replace(/```json/g, '').replace(/```/g, '').trim();\n  parsed = JSON.parse(cleaned);\n} catch (e) {\n  parsed = {\n    personalization_score: 3,\n    professionalism_score: 3,\n    relevance_score: 3,\n    clarity_score: 3,\n    actionability_score: 3,\n    justification: \"Default mid-range scores applied due to a parsing error; manual review recommended.\"\n  };\n}\n\nreturn {\n  json: Object.assign({}, prior, {\n    personalization_score: parsed.personalization_score,\n    professionalism_score: parsed.professionalism_score,\n    relevance_score: parsed.relevance_score,\n    clarity_score: parsed.clarity_score,\n    actionability_score: parsed.actionability_score,\n    qa_justification: parsed.justification,\n    processed_at: new Date().toISOString()\n  })\n};"
+      },
+      "id": "e638fd95-dc1c-4279-b48e-67062e796433",
+      "name": "Parse QA Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3072,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1TDJeo4FOZWhrYInMQF4EumNIv8YZ8nMZ7jn5AP6mUNc"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Generated_Outreach"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "member_id": "={{ $('Parse QA Response').item.json.member_id }}",
+            "full_name": "={{ $('Parse QA Response').item.json.full_name }}",
+            "country": "={{ $('Parse QA Response').item.json.country }}",
+            "academic_level": "={{ $('Parse QA Response').item.json.academic_level }}",
+            "research_area": "={{ $('Parse QA Response').item.json.research_area }}",
+            "subject": "={{ $('Parse QA Response').item.json.subject }}",
+            "email_body": "={{ $('Parse QA Response').item.json.email_body }}",
+            "cta": "={{ $('Parse QA Response').item.json.cta }}",
+            "closing": "={{ $('Parse QA Response').item.json.closing }}",
+            "engagement_score": "={{ $('Parse QA Response').item.json.engagement_score }}",
+            "engagement_reasoning": "={{ $('Parse QA Response').item.json.engagement_reasoning }}",
+            "classification": "={{ $('Parse QA Response').item.json.classification }}",
+            "classification_confidence": "={{ $('Parse QA Response').item.json.classification_confidence }}",
+            "open_likelihood": "={{ $('Parse QA Response').item.json.open_likelihood }}",
+            "open_reasoning": "={{ $('Parse QA Response').item.json.open_reasoning }}",
+            "recommended_opportunity": "={{ $('Parse QA Response').item.json.recommended_opportunity }}",
+            "recommendation_reasoning": "={{ $('Parse QA Response').item.json.recommendation_reasoning }}",
+            "edge_case_flags": "={{ $('Parse QA Response').item.json.edge_case_flags }}",
+            "processed_at": "={{ $('Parse QA Response').item.json.processed_at }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "member_id",
+              "displayName": "member_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "full_name",
+              "displayName": "full_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "country",
+              "displayName": "country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "academic_level",
+              "displayName": "academic_level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "research_area",
+              "displayName": "research_area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "biography",
+              "displayName": "biography",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "career_goals",
+              "displayName": "career_goals",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "reason_for_joining",
+              "displayName": "reason_for_joining",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "edge_case_flags",
+              "displayName": "edge_case_flags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "subject",
+              "displayName": "subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email_body",
+              "displayName": "email_body",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cta",
+              "displayName": "cta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "closing",
+              "displayName": "closing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "engagement_score",
+              "displayName": "engagement_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "engagement_reasoning",
+              "displayName": "engagement_reasoning",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "classification",
+              "displayName": "classification",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "classification_confidence",
+              "displayName": "classification_confidence",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "open_likelihood",
+              "displayName": "open_likelihood",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "open_reasoning",
+              "displayName": "open_reasoning",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "recommended_opportunity",
+              "displayName": "recommended_opportunity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "recommendation_reasoning",
+              "displayName": "recommendation_reasoning",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "personalization_score",
+              "displayName": "personalization_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "professionalism_score",
+              "displayName": "professionalism_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "relevance_score",
+              "displayName": "relevance_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "clarity_score",
+              "displayName": "clarity_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "actionability_score",
+              "displayName": "actionability_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "qa_justification",
+              "displayName": "qa_justification",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "processed_at",
+              "displayName": "processed_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "b0872bf8-f606-4d7e-9d16-c87b3fbb0e02",
+      "name": "Log Generated Outreach",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3296,
+        -160
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ZQlhbYe34nfNjWmQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1TDJeo4FOZWhrYInMQF4EumNIv8YZ8nMZ7jn5AP6mUNc"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Evaluation_Results"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "member_id": "={{ $('Parse QA Response').item.json.member_id }}",
+            "full_name": "={{ $('Parse QA Response').item.json.full_name }}",
+            "personalization_score": "={{ $('Parse QA Response').item.json.personalization_score }}",
+            "professionalism_score": "={{ $('Parse QA Response').item.json.professionalism_score }}",
+            "relevance_score": "={{ $('Parse QA Response').item.json.relevance_score }}",
+            "clarity_score": "={{ $('Parse QA Response').item.json.clarity_score }}",
+            "actionability_score": "={{ $('Parse QA Response').item.json.actionability_score }}",
+            "qa_justification": "={{ $('Parse QA Response').item.json.qa_justification }}",
+            "processed_at": "={{ $('Parse QA Response').item.json.processed_at }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "member_id",
+              "displayName": "member_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "full_name",
+              "displayName": "full_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "personalization_score",
+              "displayName": "personalization_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "professionalism_score",
+              "displayName": "professionalism_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "relevance_score",
+              "displayName": "relevance_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "clarity_score",
+              "displayName": "clarity_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "actionability_score",
+              "displayName": "actionability_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "qa_justification",
+              "displayName": "qa_justification",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processed_at",
+              "displayName": "processed_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "74db8818-b09d-4460-8008-7e5f51664700",
+      "name": "Log Evaluation Results",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3520,
+        -160
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ZQlhbYe34nfNjWmQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "list": "<__PLACEHOLDER_VALUE__Your Mailchimp Audience/List ID__>",
+        "email": "={{ $('Parse QA Response').item.json.full_name.toLowerCase().replace(/[^a-z]+/g, '.') }}@example-iaasse-test.com",
+        "status": "subscribed",
+        "jsonParameters": true,
+        "options": {
+          "tags": "={{ $('Parse QA Response').item.json.classification }}"
+        },
+        "mergeFieldsJson": "={{ { FNAME: $('Parse QA Response').item.json.full_name, SUBJECT: $('Parse QA Response').item.json.subject, EMAILBODY: $('Parse QA Response').item.json.email_body, CTA: $('Parse QA Response').item.json.cta } }}"
+      },
+      "id": "4b2d62f6-386d-4162-a390-a1753772d08e",
+      "name": "Sync Member to Mailchimp",
+      "type": "n8n-nodes-base.mailchimp",
+      "typeVersion": 1,
+      "position": [
+        3744,
+        -160
+      ],
+      "credentials": {
+        "mailchimpApi": {
+          "id": "SoRf2KL93Z7XDeZO",
+          "name": "Mailchimp account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "4d27507d-bd4a-4baf-87db-39385ede464b",
+      "name": "Loop Over Members",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        672,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const signup = $('Loop Over Members').item.json;\nconst fallback = {\n  subject: \"An invitation to connect with IAASSE\",\n  email_body: \"Dear \" + (signup.full_name || \"there\") + \", thank you for your interest in IAASSE. We would love to learn more about your work in \" + (signup.research_area || \"your field\") + \" and connect you with the right opportunities in our community.\",\n  cta: \"Reply to this email and we will schedule a short welcome call.\",\n  closing: \"Warm regards,\\nThe IAASSE Team\"\n};\nreturn { json: { candidates: [{ content: { parts: [{ text: JSON.stringify(fallback) }] } }], is_fallback: true } };"
+      },
+      "id": "da168bae-4a60-44ac-a508-0780a1f0f9a5",
+      "name": "Outreach Fallback",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const fallback = {\n  engagement_score: 50,\n  engagement_reasoning: \"Default score applied because the scoring call failed; manual review recommended.\",\n  classification: \"Passive Member\",\n  classification_confidence: 0,\n  open_likelihood: \"Medium\",\n  open_reasoning: \"Default value applied because the scoring call failed.\",\n  recommended_opportunity: \"Student Development Program\",\n  recommendation_reasoning: \"Default recommendation applied because the scoring call failed; manual review recommended.\"\n};\nreturn { json: { candidates: [{ content: { parts: [{ text: JSON.stringify(fallback) }] } }], is_fallback: true } };"
+      },
+      "id": "5cd27645-9fce-4025-92df-a6aff8059a94",
+      "name": "Score Fallback",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2048,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const fallback = {\n  personalization_score: 3,\n  professionalism_score: 3,\n  relevance_score: 3,\n  clarity_score: 3,\n  actionability_score: 3,\n  justification: \"Default mid-range scores applied because the QA evaluation call failed; manual review recommended.\"\n};\nreturn { json: { candidates: [{ content: { parts: [{ text: JSON.stringify(fallback) }] } }], is_fallback: true } };"
+      },
+      "id": "c050f9d7-1d4f-4d9d-bb6a-b6962b6057e8",
+      "name": "QA Fallback",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2848,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return { json: { mailchimp_sync_failed: true } };"
+      },
+      "id": "884c0225-67c4-4d5d-b486-89fcee97e234",
+      "name": "Mailchimp Fallback (log only)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3968,
+        16
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "aa411fc2-5390-48f2-a0e4-af4b3446f0ce",
+      "name": "On Workflow Error",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "logged_at",
+              "name": "logged_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "workflow_name",
+              "name": "workflow_name",
+              "value": "={{ $json.workflow?.name }}",
+              "type": "string"
+            },
+            {
+              "id": "failed_node",
+              "name": "failed_node",
+              "value": "={{ $json.execution?.error?.node?.name }}",
+              "type": "string"
+            },
+            {
+              "id": "error_message",
+              "name": "error_message",
+              "value": "={{ $json.execution?.error?.message }}",
+              "type": "string"
+            },
+            {
+              "id": "execution_id",
+              "name": "execution_id",
+              "value": "={{ $json.execution?.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3ad992b4-6f9c-4dea-a6ed-6a0eec503b83",
+      "name": "Format Error Log",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1TDJeo4FOZWhrYInMQF4EumNIv8YZ8nMZ7jn5AP6mUNc"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Error_Log"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "12306b29-c08e-401f-943b-cde1d1b7325e",
+      "name": "Log Error",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        448,
+        400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ZQlhbYe34nfNjWmQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Setup checklist\\n1. ✅ Google Sheet created with all 6 tabs, ID already wired into every node\\n2. ✅ Google Gemini(PaLM) Api credential already connected and attached to the 3 Gemini nodes\\n3. (Optional) Connect Mailchimp + set your Audience/List ID — note: Mailchimp campaigns are templated, so per-member personalization is passed as merge fields (SUBJECT, EMAILBODY, CTA) for use inside a Mailchimp automation/template, not as fully unique campaign bodies.\\n4. Hit \"Start Test Run\" to run all 20 members.",
+        "height": 200,
+        "width": 520,
+        "color": 4
+      },
+      "id": "8148fcc8-dba0-4770-853e-522f491e82fa",
+      "name": "Sticky Note 1cddf822",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        144
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Start Test Run": {
+      "main": [
+        [
+          {
+            "node": "Generate 20 Mock Signups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate 20 Mock Signups": {
+      "main": [
+        [
+          {
+            "node": "Log Mock Signups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Mock Signups": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Members",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read All Generated Outreach": {
+      "main": [
+        [
+          {
+            "node": "Detect Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Log Duplicate Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Duplicate Analysis": {
+      "main": [
+        [
+          {
+            "node": "Build Analytics & Final Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Analytics & Final Report": {
+      "main": [
+        [
+          {
+            "node": "Log Analytics Dashboard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini: Generate Outreach": {
+      "main": [
+        [
+          {
+            "node": "Parse Outreach Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Outreach Fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Outreach Response": {
+      "main": [
+        [
+          {
+            "node": "Gemini: Score & Classify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini: Score & Classify": {
+      "main": [
+        [
+          {
+            "node": "Parse Scoring Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Score Fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Scoring Response": {
+      "main": [
+        [
+          {
+            "node": "Gemini: QA Evaluate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini: QA Evaluate": {
+      "main": [
+        [
+          {
+            "node": "Parse QA Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "QA Fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse QA Response": {
+      "main": [
+        [
+          {
+            "node": "Log Generated Outreach",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Generated Outreach": {
+      "main": [
+        [
+          {
+            "node": "Log Evaluation Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Evaluation Results": {
+      "main": [
+        [
+          {
+            "node": "Sync Member to Mailchimp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sync Member to Mailchimp": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Members",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mailchimp Fallback (log only)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Members": {
+      "main": [
+        [
+          {
+            "node": "Read All Generated Outreach",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gemini: Generate Outreach",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Outreach Fallback": {
+      "main": [
+        [
+          {
+            "node": "Parse Outreach Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score Fallback": {
+      "main": [
+        [
+          {
+            "node": "Parse Scoring Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "QA Fallback": {
+      "main": [
+        [
+          {
+            "node": "Parse QA Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mailchimp Fallback (log only)": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Members",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On Workflow Error": {
+      "main": [
+        [
+          {
+            "node": "Format Error Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Error Log": {
+      "main": [
+        [
+          {
+            "node": "Log Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "b7d70797-1905-4c59-9e54-f78f8126a404",
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ce65a335bd8859cda6a7d12f6c83efa81348cabcee78edbf772773d50c588ea9"
+  },
+  "nodeGroups": [],
+  "id": "f2wnGBCOiXBQzR9m",
+  "tags": []
+}

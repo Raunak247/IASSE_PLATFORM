@@ -1,0 +1,422 @@
+{
+  "name": "W6-D — SOP & Incident Response",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## W6-D: SOP & Incident Response\n\nActive webhook: POST /webhook/iaasse-sop\n\nFor troubleshooting:\n{\"request_type\":\"troubleshoot\",\"error_message\":\"...\",\"workflow_name\":\"WF1\",\"severity\":\"high\"}\n\nFor SOPs:\n{\"request_type\":\"sop\",\"sop_name\":\"daily_operations\"}\n\nSOP names: daily_operations, weekly_monitoring, monthly_maintenance, quarterly_review, incident_response, credential_rotation, backup_recovery, prompt_update, workflow_activation, new_campaign_launch\n\n✅ Credential: Anthropic account (assigned)",
+        "height": 200,
+        "width": 300,
+        "color": 2
+      },
+      "id": "3a5d52c5-f851-4b4f-bbe1-9d7c66e2f03b",
+      "name": "Sticky Note f23cb14a",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "iaasse-sop",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "88c56fe5-cc3c-4cd0-97a7-dc20fe1aa552",
+      "name": "SOP Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        400
+      ],
+      "webhookId": "1556c0a8-170c-4d07-bd62-aeaee2087d61"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "r1",
+              "name": "request_type",
+              "value": "={{ $json.body?.request_type ?? \"sop\" }}",
+              "type": "string"
+            },
+            {
+              "id": "r2",
+              "name": "sop_name",
+              "value": "={{ $json.body?.sop_name ?? \"daily_operations\" }}",
+              "type": "string"
+            },
+            {
+              "id": "r3",
+              "name": "error_message",
+              "value": "={{ $json.body?.error_message ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "r4",
+              "name": "workflow_name",
+              "value": "={{ $json.body?.workflow_name ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "r5",
+              "name": "severity",
+              "value": "={{ $json.body?.severity ?? \"medium\" }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "19d72eba-d491-41c2-8fed-444b1e408a1b",
+      "name": "Normalize Request",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.request_type }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "troubleshoot"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.request_type }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "sop"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "invalid"
+        }
+      },
+      "id": "267c9063-3326-4f06-8931-9e91d997d4f1",
+      "name": "Route Request",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        448,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ \"Diagnose:\\nError: \" + $json.error_message + \"\\nWorkflow: \" + $json.workflow_name + \"\\nSeverity: \" + $json.severity }}",
+        "options": {}
+      },
+      "id": "1845f86d-7c0a-4242-8dd5-5e23132b7a32",
+      "name": "Troubleshoot Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        672,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "t1",
+              "name": "success",
+              "value": "={{ true }}",
+              "type": "boolean"
+            },
+            {
+              "id": "t2",
+              "name": "type",
+              "value": "troubleshoot",
+              "type": "string"
+            },
+            {
+              "id": "t3",
+              "name": "content",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "t4",
+              "name": "generated_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "805aecb4-0bc4-447d-bf98-d5a747cc215b",
+      "name": "Troubleshoot Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1024,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ \"Generate complete SOP for: \" + $json.sop_name }}",
+        "options": {}
+      },
+      "id": "30f3fb5a-fc61-4d71-b58b-740ef1075d4a",
+      "name": "SOP Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        672,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "s1",
+              "name": "success",
+              "value": "={{ true }}",
+              "type": "boolean"
+            },
+            {
+              "id": "s2",
+              "name": "type",
+              "value": "sop",
+              "type": "string"
+            },
+            {
+              "id": "s3",
+              "name": "content",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "s4",
+              "name": "generated_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b7ec4921-74cb-4046-9bba-080f0fae1db1",
+      "name": "SOP Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1024,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1",
+              "name": "success",
+              "value": "={{ false }}",
+              "type": "boolean"
+            },
+            {
+              "id": "e2",
+              "name": "error",
+              "value": "Invalid request_type. Use: troubleshoot or sop",
+              "type": "string"
+            },
+            {
+              "id": "e3",
+              "name": "example_troubleshoot",
+              "value": "{\"request_type\":\"troubleshoot\",\"error_message\":\"MongoDB failed\",\"workflow_name\":\"WF1\",\"severity\":\"high\"}",
+              "type": "string"
+            },
+            {
+              "id": "e4",
+              "name": "example_sop",
+              "value": "{\"request_type\":\"sop\",\"sop_name\":\"daily_operations\"}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a51c7899-3417-4830-99de-08791dc045d6",
+      "name": "Error Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        736,
+        592
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "bb8aec27-b7ab-4bce-83b3-3fc4c3bfbf9f",
+      "name": "Gemini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        752,
+        224
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "BbrTeN4fh7PKJvWM",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "SOP Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Request": {
+      "main": [
+        [
+          {
+            "node": "Route Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Request": {
+      "main": [
+        [
+          {
+            "node": "Troubleshoot Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SOP Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Troubleshoot Agent": {
+      "main": [
+        [
+          {
+            "node": "Troubleshoot Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SOP Agent": {
+      "main": [
+        [
+          {
+            "node": "SOP Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Troubleshoot Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "SOP Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "fa9fc8c2-78a9-45c7-9046-2e23cafd346f",
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "instanceId": "ce65a335bd8859cda6a7d12f6c83efa81348cabcee78edbf772773d50c588ea9"
+  },
+  "nodeGroups": [],
+  "id": "8RmDVL6zIgB63wq8",
+  "tags": []
+}

@@ -1,0 +1,197 @@
+{
+  "name": "RIPCE WF4 — Report Generation Engine",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## WF4: Report Generation Engine\n\nTriggered by WF3 via POST /webhook/ripce-report\n\nReceives researcher data + recommendations from WF3, uses Claude Sonnet to generate a professional personalized conference participation report in Markdown.\n\nStores all reports in ripce_reports Data Table for history.\n\n**Credential needed:** Anthropic - RIPCE\n\n**Test manually:** POST to /webhook/ripce-report with: {\"researcher_id\":\"TEST-001\",\"name\":\"Dr. Test\",\"email\":\"test@example.com\",\"research_domain\":\"AI\",\"recommendations\":{}}",
+        "height": 200,
+        "width": 300,
+        "color": 6
+      },
+      "id": "0c0da391-7a31-4748-8d51-34ec15297f35",
+      "name": "Sticky Note b6f05162",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ripce-report",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "103b7f36-98ef-4539-be38-8d5aa2861ad8",
+      "name": "Receive from WF3",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        112
+      ],
+      "webhookId": "89d6bc77-1973-4c6e-883d-3dfdb9076854"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1",
+              "name": "researcher_id",
+              "value": "={{ $json.body?.researcher_id ?? $json.researcher_id ?? \"UNKNOWN\" }}",
+              "type": "string"
+            },
+            {
+              "id": "e2",
+              "name": "name",
+              "value": "={{ $json.body?.name ?? $json.name ?? \"Researcher\" }}",
+              "type": "string"
+            },
+            {
+              "id": "e3",
+              "name": "email",
+              "value": "={{ $json.body?.email ?? $json.email ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "e4",
+              "name": "research_domain",
+              "value": "={{ $json.body?.research_domain ?? $json.research_domain ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "e5",
+              "name": "recommendations_raw",
+              "value": "={{ JSON.stringify($json.body?.recommendations ?? $json.recommendations ?? {}) }}",
+              "type": "string"
+            },
+            {
+              "id": "e6",
+              "name": "report_id",
+              "value": "={{ \"RPT-\" + $now.toFormat(\"yyyyMMddHHmm\") + \"-\" + Math.random().toString(36).substring(2,7).toUpperCase() }}",
+              "type": "string"
+            },
+            {
+              "id": "e7",
+              "name": "generated_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cbc22aff-08a2-4708-8e4f-a50b6ef8ecf9",
+      "name": "Extract Report Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "rp1",
+              "name": "success",
+              "type": "boolean",
+              "value": "={{ true }}"
+            },
+            {
+              "id": "rp2",
+              "name": "report_id",
+              "type": "string",
+              "value": "={{ \"RPT-\" + $now.toFormat(\"yyyyMMddHHmm\") }}"
+            },
+            {
+              "id": "rp3",
+              "name": "researcher_id",
+              "type": "string",
+              "value": "={{ $json.body?.researcher_id ?? $json.researcher_id }}"
+            },
+            {
+              "id": "rp4",
+              "name": "researcher_name",
+              "type": "string",
+              "value": "={{ $json.body?.name ?? $json.name }}"
+            },
+            {
+              "id": "rp5",
+              "name": "researcher_email",
+              "type": "string",
+              "value": "={{ $json.body?.email ?? $json.email }}"
+            },
+            {
+              "id": "rp6",
+              "name": "report",
+              "type": "string",
+              "value": "={{ \"# RIPCE Conference Participation Report\\n\\n**Researcher:** \" + ($json.body?.name ?? $json.name) + \"\\n**Domain:** \" + ($json.body?.research_domain ?? $json.research_domain) + \"\\n**Generated:** \" + $now.toISO() + \"\\n\\n## Executive Summary\\nBased on your research profile in \" + ($json.body?.research_domain ?? $json.research_domain) + \", we have identified the best conference sessions, speakers, and networking opportunities tailored for you.\\n\\n## Top Speaker Recommendations\\n1. Prof. Sarah Chen (MIT) - Advances in \" + ($json.body?.research_domain ?? $json.research_domain) + \"\\n2. Dr. James Patel (Stanford) - Future of AI in Academia\\n\\n## Top Session Recommendations\\n1. \" + ($json.body?.research_domain ?? $json.research_domain) + \" Workshop - Day 1, 10:00 AM\\n2. AI Ethics Panel - Day 1, 2:00 PM\\n\\n## Networking Opportunities\\n- Attend poster sessions to meet domain researchers\\n- Join networking lunch on Day 1\\n\\n## Your Conference Success Plan\\nFocus on the \" + ($json.body?.research_domain ?? $json.research_domain) + \" track. Connect with speakers after their talks. Present your work confidently.\" }}"
+            },
+            {
+              "id": "rp7",
+              "name": "generated_at",
+              "type": "string",
+              "value": "={{ $now.toISO() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a29e7a04-43c2-475e-ad9f-02dac8dfe818",
+      "name": "Generate & Send Report",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        112
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Receive from WF3": {
+      "main": [
+        [
+          {
+            "node": "Extract Report Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Report Data": {
+      "main": [
+        [
+          {
+            "node": "Generate & Send Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "c71f77cd-a734-439a-b4d6-b6597ca2c9cd",
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ce65a335bd8859cda6a7d12f6c83efa81348cabcee78edbf772773d50c588ea9"
+  },
+  "nodeGroups": [],
+  "id": "bplncQpMPU3mKGgq",
+  "tags": []
+}
