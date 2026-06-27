@@ -1,0 +1,55 @@
+# Environment variables
+.env
+.env.local
+.env.production
+.env.development
+
+# n8n local data
+.n8n/
+n8n-data/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+logs/
+*.log
+
+# Exports / backups
+*.zip
+*.tar.gz
+backups/
+
+# Credentials (never commit these)
+credentials.json
+service-account.json
+*-key.json
+*.pem
+*.p12
+*.pfx
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+env/
+
+# Temp
+tmp/
+temp/
+.cache/

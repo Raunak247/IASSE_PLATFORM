@@ -1,33 +1,107 @@
-# Environment Variables
+# ─── Environment & Secrets ────────────────────────────────────────────────────
 .env
 .env.*
+.env.local
+.env.production
+.env.staging
+.env.development
 
-# n8n
-.n8n/
-
-# Node
-node_modules/
-
-# Logs
-*.log
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
-
-# Credentials
-credentials/
+# ─── Credentials & API Keys ───────────────────────────────────────────────────
+credentials.json
+service-account.json
+google-credentials.json
+*credentials*.json
+*-key.json
+configsecrets
+secrets/
 *.pem
 *.key
-*.crt
-service-account.json
-secret.json
+*.p12
+*.pfx
 
-# IDE
+# ─── n8n ──────────────────────────────────────────────────────────────────────
+.n8n/
+.n8n.json
+n8n-data/
+n8n-exports/
+n8n-backup/
+
+# ─── MongoDB ──────────────────────────────────────────────────────────────────
+.mongodb/
+mongo-data/
+dump/
+
+# ─── Node.js ──────────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+.npm/
+
+# ─── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+.venv/
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ─── Logs ─────────────────────────────────────────────────────────────────────
+logs/
+*.log
+log/
+
+# ─── Exports, Backups & Archives ──────────────────────────────────────────────
+*.zip
+*.tar.gz
+backups/
+*.bak
+*.backup
+*.orig
+
+# ─── Reports & Generated Files ────────────────────────────────────────────────
+reports/
+generated/
+output/
+*.html.bak
+
+# ─── Testing ──────────────────────────────────────────────────────────────────
+coverage/
+.nyc_output/
+.test-results/
+test-results/
+
+# ─── OS ───────────────────────────────────────────────────────────────────────
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ─── IDE & Editors ────────────────────────────────────────────────────────────
 .vscode/
 .idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
+.project
+.classpath
 
-# OS Files
-.DS_Store
-Thumbs.db
+# ─── Temp & Cache ─────────────────────────────────────────────────────────────
+tmp/
+temp/
+.tmp/
+.cache/

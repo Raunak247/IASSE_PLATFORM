@@ -1,0 +1,28 @@
+# Environment / secrets
+.env
+.env.*
+*credentials*.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors / IDEs
+.vscode/
+.idea/
+*.swp
+
+# Node (in case this repo grows to include scripts/tooling)
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Logs
+*.log
+
+# n8n local data (if ever run self-hosted alongside this repo)
+.n8n/
+
+# Build output
+dist/
+build/

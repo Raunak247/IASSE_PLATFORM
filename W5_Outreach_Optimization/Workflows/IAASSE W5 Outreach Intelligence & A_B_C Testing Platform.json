@@ -1,0 +1,1625 @@
+{
+  "name": "IAASSE W5 Outreach Intelligence & A/B/C Testing Platform",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "4ecd13a8-624a-4459-9db5-a3d7f6117054",
+      "name": "Start: Run Experiment",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "title": "IAASSE Outreach Intelligence Platform - W5",
+        "sheetsUi": {
+          "sheetValues": [
+            {
+              "title": "Members"
+            },
+            {
+              "title": "Email_Variants"
+            },
+            {
+              "title": "Predictions"
+            },
+            {
+              "title": "AB_Test_Results"
+            },
+            {
+              "title": "Insights"
+            },
+            {
+              "title": "Dashboard"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6abdb496-e3ad-4e9e-bc47-4668f284862c",
+      "name": "Create IAASSE Tracking Spreadsheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        80
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ZQlhbYe34nfNjWmQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst names = [\n  \"Amara Okafor\",\"Liang Chen\",\"Sofia Rossi\",\"Kwame Mensah\",\"Yuki Tanaka\",\"Elena Petrova\",\"Rahul Mehta\",\"Fatima Al-Sayed\",\"Carlos Garcia\",\"Mei Lin\",\n  \"Ingrid Johansson\",\"Tomas Novak\",\"Aisha Bello\",\"Hiroshi Sato\",\"Valentina Cruz\",\"Omar Haddad\",\"Priya Nair\",\"Lucas Silva\",\"Noor Hassan\",\"Chidi Eze\",\n  \"Anya Kowalski\",\"Diego Fernandez\",\"Mariam Khoury\",\"Kenji Watanabe\",\"Isabela Santos\",\"Tariq Aziz\",\"Greta Becker\",\"Sanjay Gupta\",\"Camila Torres\",\"Yusuf Ibrahim\",\n  \"Nadia Rahman\",\"Felix Wagner\",\"Thandiwe Dube\",\"Marco Bianchi\",\"Leila Amari\",\"Stefan Muller\",\"Aiko Suzuki\",\"Pablo Ramirez\",\"Zanele Khumalo\",\"Ravi Shankar\",\n  \"Astrid Larsen\",\"Bashir Diallo\",\"Lucia Moreno\",\"Erik Andersson\",\"Amina Yusuf\",\"Hugo Lefevre\",\"Wei Zhang\",\"Sara Lindqvist\",\"Joaquin Vidal\",\"Grace Adeyemi\"\n];\nconst countries = [\n  \"Nigeria\",\"China\",\"Italy\",\"Ghana\",\"Japan\",\"Russia\",\"India\",\"Egypt\",\"Mexico\",\"Singapore\",\n  \"Sweden\",\"Czech Republic\",\"Nigeria\",\"Japan\",\"Brazil\",\"Lebanon\",\"India\",\"Brazil\",\"Pakistan\",\"Nigeria\",\n  \"Poland\",\"Argentina\",\"Lebanon\",\"Japan\",\"Brazil\",\"Pakistan\",\"Germany\",\"India\",\"Colombia\",\"Nigeria\",\n  \"Bangladesh\",\"Germany\",\"Zimbabwe\",\"Italy\",\"Morocco\",\"Germany\",\"Japan\",\"Spain\",\"South Africa\",\"India\",\n  \"Norway\",\"Senegal\",\"Spain\",\"Sweden\",\"Somalia\",\"France\",\"China\",\"Sweden\",\"Spain\",\"Nigeria\"\n];\nconst levelBlocks = [\n  { level: \"Undergraduate Student\" },\n  { level: \"Master's Student\" },\n  { level: \"PhD Researcher\" },\n  { level: \"Professor\" },\n  { level: \"Industry Professional\" }\n];\nconst interestPools = {\n  \"Undergraduate Student\": [\"renewable energy systems\",\"intro to machine learning\",\"sustainable urban design\",\"robotics fundamentals\",\"public health policy\",\"data ethics\",\"entrepreneurship in STEM\",\"biomedical devices\",\"climate adaptation\",\"cybersecurity basics\"],\n  \"Master's Student\": [\"applied NLP\",\"structural engineering resilience\",\"environmental economics\",\"computer vision for diagnostics\",\"supply chain optimization\",\"educational technology\",\"materials science\",\"water resource management\",\"human-computer interaction\",\"financial modeling\"],\n  \"PhD Researcher\": [\"multi-agent reinforcement learning\",\"quantum materials\",\"epidemiological modeling\",\"computational linguistics\",\"carbon capture chemistry\",\"neural signal processing\",\"urban climate resilience\",\"synthetic biology\",\"distributed systems theory\",\"behavioral economics\"],\n  \"Professor\": [\"AI governance and policy\",\"large-scale energy systems\",\"biostatistics methodology\",\"comparative international policy\",\"advanced robotics curricula\",\"translational medicine research\",\"sustainable materials engineering\",\"computational social science\",\"STEM pedagogy research\",\"applied cryptography\"],\n  \"Industry Professional\": [\"enterprise AI deployment\",\"clean energy project finance\",\"product management for health tech\",\"supply chain digitization\",\"industrial automation\",\"cloud infrastructure strategy\",\"fintech innovation\",\"talent development programs\",\"regulatory affairs\",\"venture-backed hardware startups\"]\n};\nconst goalPools = {\n  \"Undergraduate Student\": [\"secure a research internship\",\"publish a first co-authored paper\",\"build a portfolio for graduate applications\",\"find a mentor in the field\",\"join a student research lab\"],\n  \"Master's Student\": [\"complete a thesis with real-world impact\",\"transition into a PhD program\",\"present at a major conference\",\"build an industry network\",\"co-author a journal submission\"],\n  \"PhD Researcher\": [\"finish the dissertation and defend within two years\",\"publish in top-tier venues\",\"secure postdoctoral funding\",\"build a multidisciplinary collaboration\",\"present a keynote at a conference\"],\n  \"Professor\": [\"secure major grant funding\",\"grow a research lab\",\"mentor the next generation of researchers\",\"influence policy through research\",\"expand international collaborations\"],\n  \"Industry Professional\": [\"bridge research and applied deployment\",\"mentor early-career researchers\",\"find research partners for R&D projects\",\"stay current with academic advances\",\"contribute to standards and policy discussions\"]\n};\nconst motivationPools = {\n  \"Undergraduate Student\": \"wants early exposure to a professional research community and mentorship\",\n  \"Master's Student\": \"is looking for thesis collaborators and a pathway into doctoral research\",\n  \"PhD Researcher\": \"wants visibility for ongoing research and connections to funding and collaborators\",\n  \"Professor\": \"wants to expand institutional reach and find collaborators for grant-funded projects\",\n  \"Industry Professional\": \"wants to stay connected to academic research and find talent and partnership opportunities\"\n};\n\nconst members = [];\nlet idx = 0;\nfor (const block of levelBlocks) {\n  for (let i = 0; i < 10; i++) {\n    const name = names[idx];\n    const country = countries[idx];\n    const interests = interestPools[block.level];\n    const goals = goalPools[block.level];\n    const interest1 = interests[i % interests.length];\n    const interest2 = interests[(i + 3) % interests.length];\n    const goal = goals[i % goals.length];\n    members.push({\n      member_id: 'IAASSE-' + String(idx + 1).padStart(3, '0'),\n      name: name,\n      country: country,\n      academic_level: block.level,\n      research_interests: interest1 + '; ' + interest2,\n      biography: name + ' is a ' + block.level.toLowerCase() + ' based in ' + country + ' with a focus on ' + interest1 + '. Over the past few years they have built experience applying these methods to real-world problems and are now looking to deepen their involvement with the global research community.',\n      career_goals: goal,\n      motivation_for_joining: motivationPools[block.level],\n      group: ['A','B','C'][idx % 3]\n    });\n    idx++;\n  }\n}\nreturn members.map(m => ({ json: m }));\n"
+      },
+      "id": "e19c93e7-84fe-4901-b2f2-3bf70dc86f33",
+      "name": "Generate Mock Members",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "e6dcc806-4083-417e-b42b-8a5f53d2d7b7",
+      "name": "Combine Member Data + Scores",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        672,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\nfunction extractJsonText(raw) {\n  if (raw == null) return '';\n  if (typeof raw === 'string') return raw;\n  if (Array.isArray(raw)) {\n    return raw.map(p => (typeof p === 'string' ? p : ((p && (p.text ?? p.content)) || ''))).join('\\n');\n  }\n  if (typeof raw === 'object') {\n    return raw.text ?? raw.content ?? raw.output_text ?? raw.output ?? JSON.stringify(raw);\n  }\n  return String(raw);\n}\nfunction safeParseJson(text) {\n  if (!text) return null;\n  let cleaned = String(text).trim();\n  cleaned = cleaned.replace(/^```(json)?/i, '').replace(/```$/, '').trim();\n  const start = cleaned.indexOf('{');\n  const end = cleaned.lastIndexOf('}');\n  if (start >= 0 && end > start) cleaned = cleaned.slice(start, end + 1);\n  try { return JSON.parse(cleaned); } catch (e) { return null; }\n}\n\nconst allowedSegments = [\"Research Enthusiast\",\"Publication Focused\",\"Conference Seeker\",\"Networking Focused\",\"Volunteer Candidate\",\"Leadership Candidate\",\"Passive Member\"];\nconst allowedAreas = [\"Conference Participation\",\"Journal Submission\",\"Research Collaboration\",\"Volunteer Program\",\"Committee Membership\",\"Industry Networking\",\"Student Mentorship\"];\n\nreturn $input.all().map(item => {\n  const j = item.json || {};\n  const rawCandidate = j.content ?? j.text ?? j.output ?? j.message ?? j;\n  const text = extractJsonText(rawCandidate);\n  const parsed = safeParseJson(text);\n\n  const base = {\n    member_id: j.member_id, name: j.name, country: j.country, academic_level: j.academic_level,\n    research_interests: j.research_interests, biography: j.biography, career_goals: j.career_goals,\n    motivation_for_joining: j.motivation_for_joining, group: j.group\n  };\n\n  if (!parsed) {\n    return { json: { ...base,\n      engagement_score: 50, open_probability: 50, reply_probability: 30,\n      conference_attendance_probability: 30, publication_probability: 30, volunteer_probability: 30,\n      long_term_membership_probability: 30, segment: 'Passive Member', segment_confidence: 0,\n      top_recommendation_area: 'Conference Participation', recommendations_json: '[]',\n      reasoning_notes: 'Scoring call failed or returned invalid JSON; default neutral scores applied.',\n      score_parse_error: true\n    }};\n  }\n\n  const recs = Array.isArray(parsed.recommendations) ? parsed.recommendations.filter(r => r && allowedAreas.includes(r.area)) : [];\n  const sortedRecs = [...recs].sort((a,b) => (Number(b.relevance_score)||0) - (Number(a.relevance_score)||0));\n  const top = sortedRecs[0] || { area: 'Conference Participation', relevance_score: 0, explanation: '' };\n  const reasoningParts = [parsed.engagement_score_reasoning, parsed.open_probability_reasoning, parsed.reply_probability_reasoning].filter(Boolean);\n\n  return { json: { ...base,\n    engagement_score: Number(parsed.engagement_score) || 0,\n    open_probability: Number(parsed.open_probability) || 0,\n    reply_probability: Number(parsed.reply_probability) || 0,\n    conference_attendance_probability: Number(parsed.conference_attendance_probability) || 0,\n    publication_probability: Number(parsed.publication_probability) || 0,\n    volunteer_probability: Number(parsed.volunteer_probability) || 0,\n    long_term_membership_probability: Number(parsed.long_term_membership_probability) || 0,\n    segment: allowedSegments.includes(parsed.segment) ? parsed.segment : 'Passive Member',\n    segment_confidence: Number(parsed.segment_confidence) || 0,\n    top_recommendation_area: top.area,\n    recommendations_json: JSON.stringify(sortedRecs),\n    reasoning_notes: reasoningParts.join(' | '),\n    score_parse_error: false\n  }};\n});\n"
+      },
+      "id": "eed699bf-41c7-4c2b-a83e-85462d94fe83",
+      "name": "Parse Engagement Scores JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.group }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "A"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.group }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "B"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.group }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "C"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "none"
+        }
+      },
+      "id": "5e4e6daf-2247-4bf8-9740-29375f8e74b8",
+      "name": "Route by Group",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1120,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "variant_type",
+              "name": "variant_type",
+              "value": "generic",
+              "type": "string"
+            },
+            {
+              "id": "email_subject",
+              "name": "email_subject",
+              "value": "Join IAASSE: Advance Your Research Journey",
+              "type": "string"
+            },
+            {
+              "id": "email_body",
+              "name": "email_body",
+              "value": "Dear IAASSE Community Member,\\n\\nThe International Association for the Advancement of Scientific and Scholarly Exchange (IAASSE) invites you to get involved. We offer conferences, journal submission opportunities, research collaborations, volunteer programs, committee membership, industry networking, and student mentorship.\\n\\nVisit our website to learn more and get involved today.\\n\\nBest regards,\\nThe IAASSE Team",
+              "type": "string"
+            },
+            {
+              "id": "cta",
+              "name": "cta",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "recommended_opportunity",
+              "name": "recommended_opportunity",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "email_parse_error",
+              "name": "email_parse_error",
+              "value": false,
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "fed97080-0e9d-4049-a0fc-ea38e4ec5cfb",
+      "name": "Group A: Generic Email",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2016,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "id": "ddb1e711-4629-46a1-a2e1-b92ff70263a5",
+      "name": "Combine All Groups",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2240,
+        368
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "65b63905-ed3a-46b9-b4ca-052d0e90a24f",
+      "name": "Group B Branch",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        368
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "2229fb4f-4080-41da-9992-393f160dabd8",
+      "name": "Group C Branch",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        656
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "589299c8-448a-421e-8af4-11a7695a5987",
+      "name": "Combine Member Data + Email B",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1792,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\nfunction extractJsonText(raw) {\n  if (raw == null) return '';\n  if (typeof raw === 'string') return raw;\n  if (Array.isArray(raw)) {\n    return raw.map(p => (typeof p === 'string' ? p : ((p && (p.text ?? p.content)) || ''))).join('\\n');\n  }\n  if (typeof raw === 'object') {\n    return raw.text ?? raw.content ?? raw.output_text ?? raw.output ?? JSON.stringify(raw);\n  }\n  return String(raw);\n}\nfunction safeParseJson(text) {\n  if (!text) return null;\n  let cleaned = String(text).trim();\n  cleaned = cleaned.replace(/^```(json)?/i, '').replace(/```$/, '').trim();\n  const start = cleaned.indexOf('{');\n  const end = cleaned.lastIndexOf('}');\n  if (start >= 0 && end > start) cleaned = cleaned.slice(start, end + 1);\n  try { return JSON.parse(cleaned); } catch (e) { return null; }\n}\n\nreturn $input.all().map(item => {\n  const j = item.json || {};\n  const rawCandidate = j.content ?? j.text ?? j.output ?? j.message;\n  const text = extractJsonText(rawCandidate);\n  const parsed = safeParseJson(text);\n  if (!parsed) {\n    return { json: { ...j, variant_type: 'personalized', email_subject: 'An invitation from IAASSE',\n      email_body: 'We were unable to generate a personalized message for this member; please review manually.',\n      cta: '', recommended_opportunity: '', email_parse_error: true } };\n  }\n  return { json: { ...j, variant_type: 'personalized', email_subject: parsed.subject || 'An invitation from IAASSE',\n    email_body: parsed.body || '', cta: '', recommended_opportunity: '', email_parse_error: false } };\n});\n"
+      },
+      "id": "6e7601dd-6bfc-4726-88e4-25bb999d99e3",
+      "name": "Parse Personalized Email JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2016,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "88b58f92-9039-44c2-a50f-02fbb3f604f6",
+      "name": "Combine Member Data + Email C",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1792,
+        656
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\nfunction extractJsonText(raw) {\n  if (raw == null) return '';\n  if (typeof raw === 'string') return raw;\n  if (Array.isArray(raw)) {\n    return raw.map(p => (typeof p === 'string' ? p : ((p && (p.text ?? p.content)) || ''))).join('\\n');\n  }\n  if (typeof raw === 'object') {\n    return raw.text ?? raw.content ?? raw.output_text ?? raw.output ?? JSON.stringify(raw);\n  }\n  return String(raw);\n}\nfunction safeParseJson(text) {\n  if (!text) return null;\n  let cleaned = String(text).trim();\n  cleaned = cleaned.replace(/^```(json)?/i, '').replace(/```$/, '').trim();\n  const start = cleaned.indexOf('{');\n  const end = cleaned.lastIndexOf('}');\n  if (start >= 0 && end > start) cleaned = cleaned.slice(start, end + 1);\n  try { return JSON.parse(cleaned); } catch (e) { return null; }\n}\n\nreturn $input.all().map(item => {\n  const j = item.json || {};\n  const rawCandidate = j.content ?? j.text ?? j.output ?? j.message;\n  const text = extractJsonText(rawCandidate);\n  const parsed = safeParseJson(text);\n  if (!parsed) {\n    return { json: { ...j, variant_type: 'optimized', email_subject: 'An invitation from IAASSE',\n      email_body: 'We were unable to generate an optimized message for this member; please review manually.',\n      cta: '', recommended_opportunity: j.top_recommendation_area || '', email_parse_error: true } };\n  }\n  return { json: { ...j, variant_type: 'optimized', email_subject: parsed.subject || 'An invitation from IAASSE',\n    email_body: parsed.body || '', cta: parsed.cta || '', recommended_opportunity: parsed.recommended_opportunity || (j.top_recommendation_area || ''), email_parse_error: false } };\n});\n"
+      },
+      "id": "5e7dab31-5b5a-4d8b-b1b9-a1a457d57608",
+      "name": "Parse Optimized Email JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2016,
+        656
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Create IAASSE Tracking Spreadsheet').first().json.spreadsheetId }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Members"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "member_id": "={{ $json.member_id }}",
+            "name": "={{ $json.name }}",
+            "country": "={{ $json.country }}",
+            "academic_level": "={{ $json.academic_level }}",
+            "research_interests": "={{ $json.research_interests }}",
+            "biography": "={{ $json.biography }}",
+            "career_goals": "={{ $json.career_goals }}",
+            "motivation_for_joining": "={{ $json.motivation_for_joining }}",
+            "group": "={{ $json.group }}"
+          },
+          "schema": [
+            {
+              "id": "member_id",
+              "displayName": "member_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "country",
+              "displayName": "country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "academic_level",
+              "displayName": "academic_level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "research_interests",
+              "displayName": "research_interests",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "biography",
+              "displayName": "biography",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "career_goals",
+              "displayName": "career_goals",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "motivation_for_joining",
+              "displayName": "motivation_for_joining",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "group",
+              "displayName": "group",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ee1ef275-40b7-4ee7-9bfe-9ba9d7a02d67",
+      "name": "Save to Members Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2464,
+        0
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ZQlhbYe34nfNjWmQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Create IAASSE Tracking Spreadsheet').first().json.spreadsheetId }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Email_Variants"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "member_id": "={{ $json.member_id }}",
+            "name": "={{ $json.name }}",
+            "group": "={{ $json.group }}",
+            "variant_type": "={{ $json.variant_type }}",
+            "email_subject": "={{ $json.email_subject }}",
+            "email_body": "={{ $json.email_body }}",
+            "cta": "={{ $json.cta }}",
+            "recommended_opportunity": "={{ $json.recommended_opportunity }}",
+            "email_parse_error": "={{ $json.email_parse_error }}"
+          },
+          "schema": [
+            {
+              "id": "member_id",
+              "displayName": "member_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "group",
+              "displayName": "group",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "variant_type",
+              "displayName": "variant_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "email_subject",
+              "displayName": "email_subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "email_body",
+              "displayName": "email_body",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "cta",
+              "displayName": "cta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "recommended_opportunity",
+              "displayName": "recommended_opportunity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "email_parse_error",
+              "displayName": "email_parse_error",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "15f3de54-105f-4a60-9689-878e3db5fa00",
+      "name": "Save to Email_Variants Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2464,
+        192
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ZQlhbYe34nfNjWmQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Create IAASSE Tracking Spreadsheet').first().json.spreadsheetId }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Predictions"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "member_id": "={{ $json.member_id }}",
+            "name": "={{ $json.name }}",
+            "group": "={{ $json.group }}",
+            "engagement_score": "={{ $json.engagement_score }}",
+            "open_probability": "={{ $json.open_probability }}",
+            "reply_probability": "={{ $json.reply_probability }}",
+            "conference_attendance_probability": "={{ $json.conference_attendance_probability }}",
+            "publication_probability": "={{ $json.publication_probability }}",
+            "volunteer_probability": "={{ $json.volunteer_probability }}",
+            "long_term_membership_probability": "={{ $json.long_term_membership_probability }}",
+            "segment": "={{ $json.segment }}",
+            "segment_confidence": "={{ $json.segment_confidence }}",
+            "top_recommendation_area": "={{ $json.top_recommendation_area }}",
+            "recommendations_json": "={{ $json.recommendations_json }}",
+            "reasoning_notes": "={{ $json.reasoning_notes }}",
+            "score_parse_error": "={{ $json.score_parse_error }}"
+          },
+          "schema": [
+            {
+              "id": "member_id",
+              "displayName": "member_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "group",
+              "displayName": "group",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "engagement_score",
+              "displayName": "engagement_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "open_probability",
+              "displayName": "open_probability",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "reply_probability",
+              "displayName": "reply_probability",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "conference_attendance_probability",
+              "displayName": "conference_attendance_probability",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "publication_probability",
+              "displayName": "publication_probability",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "volunteer_probability",
+              "displayName": "volunteer_probability",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "long_term_membership_probability",
+              "displayName": "long_term_membership_probability",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "segment",
+              "displayName": "segment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "segment_confidence",
+              "displayName": "segment_confidence",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "top_recommendation_area",
+              "displayName": "top_recommendation_area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "recommendations_json",
+              "displayName": "recommendations_json",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "reasoning_notes",
+              "displayName": "reasoning_notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "score_parse_error",
+              "displayName": "score_parse_error",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6f0c8578-5f28-452e-b57d-e5af7fd3be7e",
+      "name": "Save to Predictions Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2464,
+        384
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ZQlhbYe34nfNjWmQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "a0ccee1e-7f6d-45ba-8dfc-65db1223085a",
+      "name": "Collect All Members",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2464,
+        576
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst items = $input.first().json.data || [];\nconst groups = ['A','B','C'];\nconst groupStats = {};\nfunction avg(list, key) { if (!list.length) return 0; return list.reduce((s,m)=>s+(Number(m[key])||0),0)/list.length; }\nfunction round1(n) { return Math.round(n*10)/10; }\n\nfor (const g of groups) {\n  const members = items.filter(m => m.group === g);\n  groupStats[g] = {\n    group: g,\n    sample_size: members.length,\n    avg_open_probability: round1(avg(members,'open_probability')),\n    avg_reply_probability: round1(avg(members,'reply_probability')),\n    avg_engagement_score: round1(avg(members,'engagement_score')),\n    avg_conference_probability: round1(avg(members,'conference_attendance_probability')),\n    avg_publication_probability: round1(avg(members,'publication_probability')),\n    avg_volunteer_probability: round1(avg(members,'volunteer_probability')),\n    avg_long_term_probability: round1(avg(members,'long_term_membership_probability'))\n  };\n}\nfunction pct(base, value) { if (!base) return 0; return round1(((value-base)/base)*100); }\nconst control = groupStats['A'];\nfor (const g of groups) {\n  groupStats[g].pct_improvement_open_vs_control = pct(control.avg_open_probability, groupStats[g].avg_open_probability);\n  groupStats[g].pct_improvement_engagement_vs_control = pct(control.avg_engagement_score, groupStats[g].avg_engagement_score);\n}\n\nconst segmentCounts = {};\nfor (const m of items) { segmentCounts[m.segment] = (segmentCounts[m.segment]||0) + 1; }\nconst bestVariant = groups.slice().sort((a,b)=>groupStats[b].avg_open_probability - groupStats[a].avg_open_probability)[0];\nconst segmentEntries = Object.entries(segmentCounts).sort((a,b)=>b[1]-a[1]);\nconst bestSegment = segmentEntries.length ? segmentEntries[0][0] : 'Unknown';\n\nconst overall = {\n  total_members: items.length,\n  avg_open_probability: round1(avg(items,'open_probability')),\n  avg_reply_probability: round1(avg(items,'reply_probability')),\n  avg_engagement_score: round1(avg(items,'engagement_score')),\n  avg_long_term_probability: round1(avg(items,'long_term_membership_probability')),\n  best_performing_variant: bestVariant,\n  best_performing_segment: bestSegment,\n  segment_distribution: segmentCounts\n};\n\nreturn [{ json: { groupResults: [groupStats['A'], groupStats['B'], groupStats['C']], overall } }];\n"
+      },
+      "id": "387a51a3-6feb-4b7a-8bcb-88c44b92f3e0",
+      "name": "Compute A/B/C Test Metrics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2688,
+        576
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\nfunction extractJsonText(raw) {\n  if (raw == null) return '';\n  if (typeof raw === 'string') return raw;\n  if (Array.isArray(raw)) {\n    return raw.map(p => (typeof p === 'string' ? p : ((p && (p.text ?? p.content)) || ''))).join('\\n');\n  }\n  if (typeof raw === 'object') {\n    return raw.text ?? raw.content ?? raw.output_text ?? raw.output ?? JSON.stringify(raw);\n  }\n  return String(raw);\n}\nfunction safeParseJson(text) {\n  if (!text) return null;\n  let cleaned = String(text).trim();\n  cleaned = cleaned.replace(/^```(json)?/i, '').replace(/```$/, '').trim();\n  const start = cleaned.indexOf('{');\n  const end = cleaned.lastIndexOf('}');\n  if (start >= 0 && end > start) cleaned = cleaned.slice(start, end + 1);\n  try { return JSON.parse(cleaned); } catch (e) { return null; }\n}\n\nconst metricsItem = $('Compute A/B/C Test Metrics').first().json;\nconst j = $input.first().json || {};\nconst rawCandidate = j.content ?? j.text ?? j.output ?? j.message;\nconst text = extractJsonText(rawCandidate);\nconst parsed = safeParseJson(text);\nconst insights = (parsed && Array.isArray(parsed.insights)) ? parsed.insights.filter(i => i && i.finding) : [];\nreturn [{ json: {\n  groupResults: metricsItem.groupResults,\n  overall: metricsItem.overall,\n  insights: insights.length ? insights : [{ category: 'Notice', finding: 'AI insight generation failed or returned invalid JSON.', recommendation: 'Re-run the Generate AI Insights step.' }]\n} }];\n"
+      },
+      "id": "d796f34d-e582-495f-b4b9-9dd3e2518ddb",
+      "name": "Parse Insights JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3136,
+        576
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst o = ($input.first().json || {}).overall || {};\nconst rows = [\n  { metric_name: 'Total Members', metric_value: String(o.total_members) },\n  { metric_name: 'Average Open Probability (%)', metric_value: String(o.avg_open_probability) },\n  { metric_name: 'Average Reply Probability (%)', metric_value: String(o.avg_reply_probability) },\n  { metric_name: 'Average Engagement Score', metric_value: String(o.avg_engagement_score) },\n  { metric_name: 'Average Long-Term Membership Probability (%)', metric_value: String(o.avg_long_term_probability) },\n  { metric_name: 'Best Performing Outreach Variant', metric_value: String(o.best_performing_variant) },\n  { metric_name: 'Best Performing Segment', metric_value: String(o.best_performing_segment) },\n  { metric_name: 'Segment Distribution', metric_value: JSON.stringify(o.segment_distribution || {}) },\n  { metric_name: 'Report Generated At', metric_value: new Date().toISOString() }\n];\nreturn rows.map(r => ({ json: r }));\n"
+      },
+      "id": "2cc2ec05-44a9-4c7a-8bb7-fecd509b87e5",
+      "name": "Build Dashboard Rows",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3360,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Create IAASSE Tracking Spreadsheet').first().json.spreadsheetId }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Dashboard"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "metric_name": "={{ $json.metric_name }}",
+            "metric_value": "={{ $json.metric_value }}"
+          },
+          "schema": [
+            {
+              "id": "metric_name",
+              "displayName": "metric_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "metric_value",
+              "displayName": "metric_value",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b9d7ee22-adab-4605-98a7-0f696b159cb8",
+      "name": "Save to Dashboard Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3584,
+        384
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ZQlhbYe34nfNjWmQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "groupResults",
+        "options": {}
+      },
+      "id": "1f6b9b42-f3a3-4d6f-999e-9e757d6271c5",
+      "name": "Split Group Results",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        3360,
+        576
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Create IAASSE Tracking Spreadsheet').first().json.spreadsheetId }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "AB_Test_Results"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "group": "={{ $json.group }}",
+            "sample_size": "={{ $json.sample_size }}",
+            "avg_open_probability": "={{ $json.avg_open_probability }}",
+            "avg_reply_probability": "={{ $json.avg_reply_probability }}",
+            "avg_engagement_score": "={{ $json.avg_engagement_score }}",
+            "avg_conference_probability": "={{ $json.avg_conference_probability }}",
+            "avg_publication_probability": "={{ $json.avg_publication_probability }}",
+            "avg_volunteer_probability": "={{ $json.avg_volunteer_probability }}",
+            "avg_long_term_probability": "={{ $json.avg_long_term_probability }}",
+            "pct_improvement_open_vs_control": "={{ $json.pct_improvement_open_vs_control }}",
+            "pct_improvement_engagement_vs_control": "={{ $json.pct_improvement_engagement_vs_control }}"
+          },
+          "schema": [
+            {
+              "id": "group",
+              "displayName": "group",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "sample_size",
+              "displayName": "sample_size",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "avg_open_probability",
+              "displayName": "avg_open_probability",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "avg_reply_probability",
+              "displayName": "avg_reply_probability",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "avg_engagement_score",
+              "displayName": "avg_engagement_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "avg_conference_probability",
+              "displayName": "avg_conference_probability",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "avg_publication_probability",
+              "displayName": "avg_publication_probability",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "avg_volunteer_probability",
+              "displayName": "avg_volunteer_probability",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "avg_long_term_probability",
+              "displayName": "avg_long_term_probability",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "pct_improvement_open_vs_control",
+              "displayName": "pct_improvement_open_vs_control",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "pct_improvement_engagement_vs_control",
+              "displayName": "pct_improvement_engagement_vs_control",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "15933517-75c6-4111-9b9f-bd4884b748d4",
+      "name": "Save to AB_Test_Results Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3584,
+        576
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ZQlhbYe34nfNjWmQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "insights",
+        "options": {}
+      },
+      "id": "b4216563-9531-4c3a-93f9-70a853b4dd5b",
+      "name": "Split Insights",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        3360,
+        768
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Create IAASSE Tracking Spreadsheet').first().json.spreadsheetId }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Insights"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "category": "={{ $json.category }}",
+            "finding": "={{ $json.finding }}",
+            "recommendation": "={{ $json.recommendation }}"
+          },
+          "schema": [
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "finding",
+              "displayName": "finding",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "recommendation",
+              "displayName": "recommendation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bfaac353-5547-4986-aaa5-229b5747408b",
+      "name": "Save to Insights Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3584,
+        768
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ZQlhbYe34nfNjWmQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "models/gemini-2.5-flash-lite"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Member profile:\nName: {{ $json.name }}\nCountry: {{ $json.country }}\nAcademic Level: {{ $json.academic_level }}\nResearch Interests: {{ $json.research_interests }}\nBiography: {{ $json.biography }}\nCareer Goals: {{ $json.career_goals }}\nMotivation For Joining IAASSE: {{ $json.motivation_for_joining }}\n\nScore this member and respond with the required JSON only."
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "builtInTools": {},
+        "options": {
+          "includeMergedResponse": true,
+          "systemMessage": "You are a senior data scientist for IAASSE, an international academic research society. Given a prospective member's profile, produce calibrated, DISCRIMINATING predictive scores (scores should vary meaningfully across different profiles, not cluster around the same value) and brief reasoning grounded in concrete cues from the profile.\n\nRespond with ONLY valid JSON (no markdown fences, no commentary) matching exactly this shape:\n{\n  \"engagement_score\": number (0-100),\n  \"engagement_score_reasoning\": string,\n  \"open_probability\": number (0-100),\n  \"open_probability_reasoning\": string,\n  \"reply_probability\": number (0-100),\n  \"reply_probability_reasoning\": string,\n  \"conference_attendance_probability\": number (0-100),\n  \"publication_probability\": number (0-100),\n  \"volunteer_probability\": number (0-100),\n  \"long_term_membership_probability\": number (0-100),\n  \"segment\": one of [\"Research Enthusiast\",\"Publication Focused\",\"Conference Seeker\",\"Networking Focused\",\"Volunteer Candidate\",\"Leadership Candidate\",\"Passive Member\"],\n  \"segment_confidence\": number (0-100),\n  \"recommendations\": [\n    { \"area\": one of [\"Conference Participation\",\"Journal Submission\",\"Research Collaboration\",\"Volunteer Program\",\"Committee Membership\",\"Industry Networking\",\"Student Mentorship\"], \"relevance_score\": number (0-100), \"explanation\": string }\n    // include all 7 areas, each ranked with its own relevance_score\n  ]\n}",
+          "maxOutputTokens": 1300,
+          "temperature": 0.4
+        }
+      },
+      "id": "f2e7d8f3-7e29-494e-8700-37338119743b",
+      "name": "Score Member Engagement (Gemini)",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        416
+      ],
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "BbrTeN4fh7PKJvWM",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "models/gemini-2.5-flash-lite"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Member profile:\nName: {{ $json.name }}\nCountry: {{ $json.country }}\nAcademic Level: {{ $json.academic_level }}\nResearch Interests: {{ $json.research_interests }}\nBiography: {{ $json.biography }}\nCareer Goals: {{ $json.career_goals }}\nMotivation For Joining IAASSE: {{ $json.motivation_for_joining }}\n\nWrite the personalized outreach email and respond with the required JSON only."
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "builtInTools": {},
+        "options": {
+          "includeMergedResponse": true,
+          "systemMessage": "You are an outreach specialist for IAASSE, an international academic research society. Write a warm, specific, professional outreach email personalized to this member, referencing their actual research interests and career goals. 3-4 short paragraphs, plain text (no markdown).\n\nRespond with ONLY valid JSON (no markdown fences, no commentary): {\"subject\": string, \"body\": string}",
+          "maxOutputTokens": 700,
+          "temperature": 0.7
+        }
+      },
+      "id": "c9eba622-5528-4ff3-8594-e83b43129cac",
+      "name": "Group B: Personalized Email (Gemini)",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        1568,
+        512
+      ],
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "BbrTeN4fh7PKJvWM",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "models/gemini-2.5-flash-lite"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Member profile:\nName: {{ $json.name }}\nCountry: {{ $json.country }}\nAcademic Level: {{ $json.academic_level }}\nResearch Interests: {{ $json.research_interests }}\nBiography: {{ $json.biography }}\nCareer Goals: {{ $json.career_goals }}\nMotivation For Joining IAASSE: {{ $json.motivation_for_joining }}\nTop recommended IAASSE opportunity for this member (from prior scoring): {{ $json.top_recommendation_area }}\n\nWrite the optimized outreach email and respond with the required JSON only."
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "builtInTools": {},
+        "options": {
+          "includeMergedResponse": true,
+          "systemMessage": "You are an outreach specialist for IAASSE, an international academic research society. Write a warm, specific, professional outreach email personalized to this member, referencing their actual research interests and career goals. Then add an optimization layer: a single compelling call-to-action sentence built around the member's top recommended opportunity. 3-4 short paragraphs, plain text (no markdown).\n\nRespond with ONLY valid JSON (no markdown fences, no commentary): {\"subject\": string, \"body\": string, \"cta\": string, \"recommended_opportunity\": string, \"recommendation_rationale\": string}",
+          "maxOutputTokens": 800,
+          "temperature": 0.7
+        }
+      },
+      "id": "7ca0740f-4735-42bf-ac0d-c1e557b5f66c",
+      "name": "Group C: Optimized Email (Gemini)",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        1568,
+        800
+      ],
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "BbrTeN4fh7PKJvWM",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "models/gemini-2.5-flash-lite"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Group results: {{ JSON.stringify($json.groupResults) }}\nOverall stats: {{ JSON.stringify($json.overall) }}\n\nGenerate the insights and respond with the required JSON only."
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "builtInTools": {},
+        "options": {
+          "includeMergedResponse": true,
+          "systemMessage": "You are a research analyst summarizing an A/B/C outreach experiment for IAASSE (Group A = generic control email, Group B = AI-personalized email, Group C = AI-personalized + optimized email with CTA and recommendation). Given aggregated group statistics and a member-segment distribution, produce specific, actionable findings for IAASSE leadership.\n\nRespond with ONLY valid JSON (no markdown fences, no commentary): {\"insights\": [{\"category\": string, \"finding\": string, \"recommendation\": string}, ...]}\nInclude at least 6 distinct insights covering: which outreach style (A/B/C) performed best and by how much, which member segment responds best overall, which segment has the highest conference attendance potential, which has the highest publication potential, which has the highest volunteer potential, which has the highest long-term membership potential, and one overall strategic recommendation for IAASSE.",
+          "maxOutputTokens": 1300,
+          "temperature": 0.5
+        }
+      },
+      "id": "6ab613fc-be05-4fe1-972b-d6cbbc6bd1c8",
+      "name": "Generate AI Insights (Gemini)",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        2912,
+        576
+      ],
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "executeOnce": true,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "BbrTeN4fh7PKJvWM",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Start: Run Experiment": {
+      "main": [
+        [
+          {
+            "node": "Create IAASSE Tracking Spreadsheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate Mock Members",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Mock Members": {
+      "main": [
+        [
+          {
+            "node": "Combine Member Data + Scores",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Score Member Engagement (Gemini)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Member Data + Scores": {
+      "main": [
+        [
+          {
+            "node": "Parse Engagement Scores JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Engagement Scores JSON": {
+      "main": [
+        [
+          {
+            "node": "Route by Group",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Group": {
+      "main": [
+        [
+          {
+            "node": "Group A: Generic Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Group B Branch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Group C Branch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Group A: Generic Email": {
+      "main": [
+        [
+          {
+            "node": "Combine All Groups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine All Groups": {
+      "main": [
+        [
+          {
+            "node": "Save to Members Sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Save to Email_Variants Sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Save to Predictions Sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Collect All Members",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Group B Branch": {
+      "main": [
+        [
+          {
+            "node": "Combine Member Data + Email B",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Group B: Personalized Email (Gemini)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Group C Branch": {
+      "main": [
+        [
+          {
+            "node": "Combine Member Data + Email C",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Group C: Optimized Email (Gemini)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Member Data + Email B": {
+      "main": [
+        [
+          {
+            "node": "Parse Personalized Email JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Personalized Email JSON": {
+      "main": [
+        [
+          {
+            "node": "Combine All Groups",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Combine Member Data + Email C": {
+      "main": [
+        [
+          {
+            "node": "Parse Optimized Email JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Optimized Email JSON": {
+      "main": [
+        [
+          {
+            "node": "Combine All Groups",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Collect All Members": {
+      "main": [
+        [
+          {
+            "node": "Compute A/B/C Test Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Insights JSON": {
+      "main": [
+        [
+          {
+            "node": "Build Dashboard Rows",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Split Group Results",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Split Insights",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Dashboard Rows": {
+      "main": [
+        [
+          {
+            "node": "Save to Dashboard Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Group Results": {
+      "main": [
+        [
+          {
+            "node": "Save to AB_Test_Results Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Insights": {
+      "main": [
+        [
+          {
+            "node": "Save to Insights Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score Member Engagement (Gemini)": {
+      "main": [
+        [
+          {
+            "node": "Combine Member Data + Scores",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Group B: Personalized Email (Gemini)": {
+      "main": [
+        [
+          {
+            "node": "Combine Member Data + Email B",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Group C: Optimized Email (Gemini)": {
+      "main": [
+        [
+          {
+            "node": "Combine Member Data + Email C",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Compute A/B/C Test Metrics": {
+      "main": [
+        [
+          {
+            "node": "Generate AI Insights (Gemini)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate AI Insights (Gemini)": {
+      "main": [
+        [
+          {
+            "node": "Parse Insights JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "a20e4a42-86cf-4e8b-bf6d-d35c8ac93da5",
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "instanceId": "ce65a335bd8859cda6a7d12f6c83efa81348cabcee78edbf772773d50c588ea9"
+  },
+  "nodeGroups": [],
+  "id": "WJ2CafptuXMXq1pF",
+  "tags": []
+}
